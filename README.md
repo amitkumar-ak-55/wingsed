@@ -1,5 +1,7 @@
 # WingsEd - Digital Sherpa V1
 
+> 🎓 Helping Indian students find their dream universities abroad
+
 A minimalist, trust-first web application for Indian students planning to study abroad (postgraduate).
 
 ## 🏗️ Tech Stack
