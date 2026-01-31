@@ -1,0 +1,98 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================
+// Enums
+// ===========================================
+
+enum Role {
+  STUDENT
+  ADMIN
+  COUNSELOR
+}
+
+enum TestTaken {
+  IELTS
+  GRE
+  NONE
+}
+
+// ===========================================
+// Models
+// ===========================================
+
+model User {
+  id             String          @id @default(cuid())
+  email          String          @unique
+  clerkId        String          @unique
+  role           Role            @default(STUDENT)
+  onboardingStep Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  studentProfile StudentProfile?
+
+  @@map("users")
+}
+
+model StudentProfile {
+  id                 String    @id @default(cuid())
+  userId             String    @unique
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  country            String
+  budgetMin          Int?
+  budgetMax          Int?
+  targetField        String
+  intake             String?
+  testTaken          TestTaken
+  postWhatsAppStatus String?   // success feedback after WhatsApp redirect
+  whatsAppRedirectAt DateTime? // when user was redirected to WhatsApp
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@map("student_profiles")
+}
+
+model University {
+  id            String   @id @default(cuid())
+  name          String
+  country       String
+  city          String
+  tuitionFee    Int      // Annual tuition in USD
+  publicPrivate String   // "Public" or "Private"
+  logoUrl       String?  // Optional logo URL
+  description   String?  // Brief description/narrative
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([country])
+  @@index([tuitionFee])
+  @@map("universities")
+}
+
+// Lead tracking for WhatsApp redirects
+model WhatsAppLead {
+  id           String   @id @default(cuid())
+  clerkId      String
+  email        String
+  name         String?
+  country      String?
+  budgetMin    Int?
+  budgetMax    Int?
+  targetField  String?
+  messageText  String   // The pre-filled WhatsApp message
+  redirectedAt DateTime @default(now())
+  feedbackAt   DateTime?
+  feedback     String?  // "connected" or "no_response"
+
+  @@index([clerkId])
+  @@map("whatsapp_leads")
+}
