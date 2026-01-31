@@ -37,18 +37,11 @@ export interface University {
   name: string;
   country: string;
   city: string;
-  avgTuitionInr: number;
-  avgTuitionUsd: number;
-  qsRanking: number | null;
-  programsOffered: string[];
-  intakes: string[];
-  ieltsReq: number | null;
-  toeflReq: number | null;
-  greReq: number | null;
-  gmatReq: number | null;
-  publicPrivate: string | null;
+  tuitionFee: number; // USD annual tuition
+  publicPrivate: "Public" | "Private" | null;
   logoUrl: string | null;
   websiteUrl: string | null;
+  description: string | null;
   createdAt: string;
   updatedAt: string;
 }

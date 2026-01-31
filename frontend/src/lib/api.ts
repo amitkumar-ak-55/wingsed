@@ -2,7 +2,7 @@
 // API Client with Security Best Practices
 // ===========================================
 
-import type { User, University, StudentProfile } from "@/types";
+import type { User, University } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -266,23 +266,28 @@ export const api = {
     limit?: number;
   }) => {
     const searchParams = new URLSearchParams();
-    if (params.q) searchParams.set("q", params.q);
+    // Map 'q' to 'search' for backend compatibility
+    if (params.q) searchParams.set("search", params.q);
     if (params.country) searchParams.set("country", params.country);
     if (params.budgetMin) searchParams.set("budgetMin", params.budgetMin.toString());
     if (params.budgetMax) searchParams.set("budgetMax", params.budgetMax.toString());
     if (params.page) searchParams.set("page", params.page.toString());
-    if (params.limit) searchParams.set("limit", params.limit.toString());
+    // Map 'limit' to 'pageSize' for backend compatibility
+    if (params.limit) searchParams.set("pageSize", params.limit.toString());
 
     const query = searchParams.toString();
     const result = await apiClient<{
-      universities: any[];
+      data: University[];
       total: number;
       page: number;
       totalPages: number;
-    }>(`/universities/search${query ? `?${query}` : ""}`, {
+    }>(`/universities${query ? `?${query}` : ""}`, {
       token: token || undefined,
     });
 
-    return result.data || { universities: [], total: 0, page: 1, totalPages: 1 };
+    // Map 'data' to 'universities' for frontend compatibility
+    return result.data 
+      ? { universities: result.data.data, total: result.data.total, page: result.data.page, totalPages: result.data.totalPages }
+      : { universities: [], total: 0, page: 1, totalPages: 1 };
   },
 };

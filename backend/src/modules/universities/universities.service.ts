@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { University, Prisma } from '@prisma/client';
 
+// INR to USD conversion rate
+const INR_TO_USD_RATE = 83;
+
 export interface UniversityFilters {
   country?: string;
-  budgetMin?: number;
-  budgetMax?: number;
+  budgetMin?: number; // in INR
+  budgetMax?: number; // in INR
   search?: string;
 }
 
@@ -36,14 +39,16 @@ export class UniversitiesService {
       where.country = filters.country;
     }
 
-    // Budget range filter
+    // Budget range filter (convert INR to USD since tuitionFee is stored in USD)
     if (filters.budgetMin !== undefined || filters.budgetMax !== undefined) {
       where.tuitionFee = {};
       if (filters.budgetMin !== undefined) {
-        where.tuitionFee.gte = filters.budgetMin;
+        // Convert INR to USD
+        where.tuitionFee.gte = Math.floor(filters.budgetMin / INR_TO_USD_RATE);
       }
       if (filters.budgetMax !== undefined) {
-        where.tuitionFee.lte = filters.budgetMax;
+        // Convert INR to USD
+        where.tuitionFee.lte = Math.ceil(filters.budgetMax / INR_TO_USD_RATE);
       }
     }
 

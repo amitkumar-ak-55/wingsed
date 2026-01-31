@@ -69,6 +69,7 @@ model University {
   tuitionFee    Int      // Annual tuition in USD
   publicPrivate String   // "Public" or "Private"
   logoUrl       String?  // Optional logo URL
+  websiteUrl    String?  // University website URL
   description   String?  // Brief description/narrative
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

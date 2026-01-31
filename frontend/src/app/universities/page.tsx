@@ -19,7 +19,7 @@ interface Filters {
 }
 
 // Debounce utility
-function debounce<T extends (...args: any[]) => any>(fn: T, ms: number) {
+function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number) {
   let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
@@ -122,7 +122,7 @@ function UniversitiesContent() {
     try {
       const token = isSignedIn ? await getToken() : null;
       
-      const params: any = {
+      const params: Record<string, string | number> = {
         page: currentPage,
         limit: 12,
       };
@@ -150,6 +150,7 @@ function UniversitiesContent() {
   }, [isSignedIn, getToken]);
 
   // Debounced search
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((currentFilters: Filters) => {
       setPage(1);
@@ -352,101 +353,128 @@ function UniversitiesContent() {
 // University Card Component
 function UniversityCard({
   university,
-  profile,
 }: {
   university: University;
-  profile: StudentProfile | null;
+  profile?: StudentProfile | null;
 }) {
-  const { isSignedIn } = useAuth();
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const descriptionThreshold = 120; // characters before truncating
+  const shouldTruncate = university.description && university.description.length > descriptionThreshold;
 
   return (
     <Card className="p-6 hover:shadow-lg transition-shadow duration-300 animate-fadeIn">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
+      {/* Header with Logo */}
+      <div className="flex items-start gap-4 mb-4">
+        {/* Logo */}
+        <div className="w-16 h-16 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+          {university.logoUrl ? (
+            <img
+              src={university.logoUrl}
+              alt={`${university.name} logo`}
+              className="w-full h-full object-contain p-2"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
+          <span className={`text-2xl font-bold text-gray-400 ${university.logoUrl ? 'hidden' : ''}`}>
+            {university.name.charAt(0)}
+          </span>
+        </div>
+        
+        {/* Title and Location */}
+        <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold text-[#111827] mb-1 line-clamp-2">
             {university.name}
           </h3>
           <div className="flex items-center gap-2 text-sm text-[#6B7280]">
             <span>{getCountryFlag(university.country)}</span>
-            <span>{university.city}, {university.country}</span>
+            <span className="truncate">{university.city}, {university.country}</span>
           </div>
         </div>
-        {university.qsRanking && (
-          <div className="bg-[#2563EB]/10 text-[#2563EB] text-xs font-semibold px-2 py-1 rounded-full">
-            QS #{university.qsRanking}
-          </div>
-        )}
       </div>
+
+      {/* Badge */}
+      {university.publicPrivate && (
+        <div className="mb-3">
+          <span className={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${university.publicPrivate === 'Public' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'}`}>
+            {university.publicPrivate}
+          </span>
+        </div>
+      )}
 
       {/* Fees */}
       <div className="mb-4 p-3 bg-[#F9FAFB] rounded-lg">
         <div className="text-xs text-[#6B7280] mb-1">Annual Tuition</div>
         <div className="flex items-baseline gap-2">
           <span className="text-lg font-bold text-[#111827]">
-            {formatINR(university.avgTuitionInr)}
+            {formatUSD(university.tuitionFee)}
           </span>
           <span className="text-sm text-[#6B7280]">
-            ({formatUSD(university.avgTuitionUsd)})
+            ({formatINR(university.tuitionFee * 83)})
           </span>
         </div>
       </div>
 
-      {/* Programs */}
-      {university.programsOffered && university.programsOffered.length > 0 && (
+      {/* Description */}
+      {university.description && (
         <div className="mb-4">
-          <div className="text-xs text-[#6B7280] mb-2">Programs</div>
-          <div className="flex flex-wrap gap-1">
-            {university.programsOffered.slice(0, 3).map((program) => (
-              <span
-                key={program}
-                className="text-xs px-2 py-1 bg-[#F3F4F6] text-[#374151] rounded-full"
-              >
-                {program}
-              </span>
-            ))}
-            {university.programsOffered.length > 3 && (
-              <span className="text-xs px-2 py-1 text-[#6B7280]">
-                +{university.programsOffered.length - 3} more
-              </span>
-            )}
-          </div>
+          <p className="text-sm text-[#6B7280]">
+            {showFullDescription || !shouldTruncate
+              ? university.description
+              : `${university.description.slice(0, descriptionThreshold)}...`}
+          </p>
+          {shouldTruncate && (
+            <button
+              onClick={() => setShowFullDescription(!showFullDescription)}
+              className="text-sm text-[#2563EB] hover:text-[#1D4ED8] font-medium mt-1"
+            >
+              {showFullDescription ? "See less" : "See more"}
+            </button>
+          )}
         </div>
       )}
 
-      {/* Requirements */}
-      <div className="flex flex-wrap gap-2 mb-4 text-xs text-[#6B7280]">
-        {university.ieltsReq && (
-          <span className="px-2 py-1 bg-[#F9FAFB] rounded">
-            IELTS: {university.ieltsReq}+
-          </span>
+      {/* Action Buttons */}
+      <div className="flex gap-2">
+        {/* Visit Website Button */}
+        {university.websiteUrl ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => {
+              window.open(university.websiteUrl!, "_blank", "noopener,noreferrer");
+            }}
+          >
+            Visit Website
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            disabled
+          >
+            No Website
+          </Button>
         )}
-        {university.greReq && (
-          <span className="px-2 py-1 bg-[#F9FAFB] rounded">
-            GRE: {university.greReq}+
-          </span>
-        )}
-        {university.gmatReq && (
-          <span className="px-2 py-1 bg-[#F9FAFB] rounded">
-            GMAT: {university.gmatReq}+
-          </span>
-        )}
+        
+        {/* WhatsApp Button */}
+        <Button
+          variant="primary"
+          size="sm"
+          className="flex-1"
+          onClick={() => {
+            const message = `Hi, I'm interested in ${university.name} in ${university.country}. Can you tell me more about admission requirements and application process?`;
+            const whatsappUrl = `https://wa.me/918658805653?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+          }}
+        >
+          WhatsApp Us
+        </Button>
       </div>
-
-      {/* Action */}
-      <Button
-        variant="primary"
-        size="sm"
-        className="w-full"
-        onClick={() => {
-          // Open WhatsApp with university-specific message
-          const message = `Hi, I'm interested in ${university.name} in ${university.country}. Can you tell me more about admission requirements and application process?`;
-          const whatsappUrl = `https://wa.me/918658805653?text=${encodeURIComponent(message)}`;
-          window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-        }}
-      >
-        Learn More on WhatsApp
-      </Button>
     </Card>
   );
 }
