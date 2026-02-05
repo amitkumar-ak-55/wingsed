@@ -107,4 +107,54 @@ export class UniversitiesService {
   async getCount(): Promise<number> {
     return this.prisma.university.count();
   }
+
+  /**
+   * Get personalized recommendations based on user profile
+   */
+  async getRecommendations(
+    preferredCountry?: string,
+    budgetMin?: number, // in INR
+    budgetMax?: number, // in INR
+    limit: number = 6,
+  ): Promise<University[]> {
+    const where: Prisma.UniversityWhereInput = {};
+
+    // Filter by preferred country if provided
+    if (preferredCountry) {
+      where.country = preferredCountry;
+    }
+
+    // Budget range filter (convert INR to USD)
+    if (budgetMin !== undefined || budgetMax !== undefined) {
+      where.tuitionFee = {};
+      if (budgetMin !== undefined) {
+        where.tuitionFee.gte = Math.floor(budgetMin / INR_TO_USD_RATE);
+      }
+      if (budgetMax !== undefined) {
+        where.tuitionFee.lte = Math.ceil(budgetMax / INR_TO_USD_RATE);
+      }
+    }
+
+    // Get matching universities
+    let recommendations = await this.prisma.university.findMany({
+      where,
+      orderBy: { name: 'asc' },
+      take: limit,
+    });
+
+    // If not enough results, fill with random universities from other criteria
+    if (recommendations.length < limit) {
+      const existingIds = recommendations.map((u) => u.id);
+      const additional = await this.prisma.university.findMany({
+        where: {
+          id: { notIn: existingIds },
+        },
+        orderBy: { tuitionFee: 'asc' }, // Prefer affordable options
+        take: limit - recommendations.length,
+      });
+      recommendations = [...recommendations, ...additional];
+    }
+
+    return recommendations;
+  }
 }

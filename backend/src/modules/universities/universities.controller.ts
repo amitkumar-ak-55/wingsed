@@ -54,6 +54,27 @@ export class UniversitiesController {
   }
 
   /**
+   * Get personalized recommendations (public endpoint)
+   * Uses query params for preferences (can be from profile or URL)
+   */
+  @Get('recommendations')
+  @HttpCode(HttpStatus.OK)
+  async getRecommendations(
+    @Query('country') country?: string,
+    @Query('budgetMin') budgetMin?: string,
+    @Query('budgetMax') budgetMax?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const recommendations = await this.universitiesService.getRecommendations(
+      country,
+      budgetMin ? parseInt(budgetMin, 10) : undefined,
+      budgetMax ? parseInt(budgetMax, 10) : undefined,
+      limit ? parseInt(limit, 10) : 6,
+    );
+    return { recommendations };
+  }
+
+  /**
    * Get single university by ID (public endpoint)
    */
   @Get(':id')

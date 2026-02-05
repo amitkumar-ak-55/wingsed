@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const inter = Inter({
@@ -43,7 +44,9 @@ export default function RootLayout({
           className={`${inter.variable} font-sans min-h-screen bg-[#F9FAFB] text-[#111827] antialiased`}
           suppressHydrationWarning
         >
-          {children}
+          <Providers>
+            {children}
+          </Providers>
         </body>
       </html>
     </ClerkProvider>

@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
-import { Header, Footer, WhatsAppButton } from "@/components";
+import { Header, Footer, WhatsAppButton, SaveButton, TrackButton, CompareButton, CompareBar } from "@/components";
 import { Button, Input, Select, Card, Skeleton } from "@/components/ui";
 import { COUNTRIES, BUDGET_RANGES } from "@/data/constants";
-import { api } from "@/lib/api";
+import { api, getRecommendations } from "@/lib/api";
 import { formatINR, formatUSD, getCountryFlag } from "@/lib/utils";
 import type { University, StudentProfile } from "@/types";
 
@@ -19,7 +20,7 @@ interface Filters {
 }
 
 // Debounce utility
-function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number) {
+function debounce<T extends (...args: never[]) => void>(fn: T, ms: number) {
   let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
@@ -68,8 +69,10 @@ function UniversitiesContent() {
   const { isLoaded, isSignedIn, getToken } = useAuth();
 
   const [universities, setUniversities] = useState<University[]>([]);
+  const [recommendations, setRecommendations] = useState<University[]>([]);
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingRecs, setIsLoadingRecs] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -82,10 +85,24 @@ function UniversitiesContent() {
     field: searchParams.get("field") || "",
   });
 
-  // Load user profile if signed in
+  // Load user profile and recommendations if signed in
   useEffect(() => {
     const loadProfile = async () => {
-      if (!isSignedIn) return;
+      if (!isSignedIn) {
+        // For guests, load general recommendations
+        setIsLoadingRecs(true);
+        try {
+          const recsResult = await getRecommendations({ limit: 4 });
+          if (recsResult.data?.recommendations) {
+            setRecommendations(recsResult.data.recommendations);
+          }
+        } catch (error) {
+          console.error("Failed to load recommendations:", error);
+        } finally {
+          setIsLoadingRecs(false);
+        }
+        return;
+      }
       
       try {
         const token = await getToken();
@@ -94,6 +111,25 @@ function UniversitiesContent() {
         const user = await api.getCurrentUser(token);
         if (user?.profile) {
           setProfile(user.profile);
+          
+          // Load personalized recommendations
+          setIsLoadingRecs(true);
+          try {
+            const recsResult = await getRecommendations({
+              country: user.profile.preferredCountries?.[0],
+              budgetMin: user.profile.budgetMin ?? undefined,
+              budgetMax: user.profile.budgetMax ?? undefined,
+              limit: 4,
+            });
+            if (recsResult.data?.recommendations) {
+              setRecommendations(recsResult.data.recommendations);
+            }
+          } catch (error) {
+            console.error("Failed to load recommendations:", error);
+          } finally {
+            setIsLoadingRecs(false);
+          }
+
           // Pre-fill filters from profile if no URL params
           if (!searchParams.toString()) {
             const profile = user.profile;
@@ -273,6 +309,74 @@ function UniversitiesContent() {
           </div>
         </div>
 
+        {/* Recommendations Section */}
+        {recommendations.length > 0 && !filters.search && !filters.country && !filters.budgetMin && (
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <svg className="w-5 h-5 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+              <h2 className="text-lg font-semibold text-[#111827]">
+                {profile ? "Recommended for You" : "Popular Universities"}
+              </h2>
+              {profile && (
+                <span className="text-xs text-[#6B7280] bg-blue-50 px-2 py-1 rounded-full">
+                  Based on your profile
+                </span>
+              )}
+            </div>
+            {isLoadingRecs ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Skeleton className="w-10 h-10 rounded-lg" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-3/4 mb-1" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-6 w-full" />
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {recommendations.map((uni) => (
+                  <Link key={uni.id} href={`/universities/${uni.id}`}>
+                    <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer h-full">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-10 h-10 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                          {uni.logoUrl ? (
+                            <img
+                              src={uni.logoUrl}
+                              alt={uni.name}
+                              className="w-full h-full object-contain p-1"
+                            />
+                          ) : (
+                            <span className="text-sm font-bold text-gray-400">{uni.name.charAt(0)}</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-semibold text-[#111827] line-clamp-1 hover:text-[#2563EB] transition-colors">
+                            {uni.name}
+                          </h3>
+                          <p className="text-xs text-[#6B7280]">
+                            {getCountryFlag(uni.country)} {uni.city}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-sm font-medium text-[#111827]">
+                        {formatUSD(uni.tuitionFee)}/yr
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Results Count */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-[#6B7280]">
@@ -338,6 +442,7 @@ function UniversitiesContent() {
       </main>
 
       <Footer />
+      <CompareBar />
       <WhatsAppButton
         userData={{
           country: filters.country || undefined,
@@ -362,11 +467,11 @@ function UniversityCard({
   const shouldTruncate = university.description && university.description.length > descriptionThreshold;
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow duration-300 animate-fadeIn">
+    <Card className="p-6 hover:shadow-lg transition-shadow duration-300 animate-fadeIn flex flex-col">
       {/* Header with Logo */}
       <div className="flex items-start gap-4 mb-4">
         {/* Logo */}
-        <div className="w-16 h-16 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+        <div className="w-14 h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
           {university.logoUrl ? (
             <img
               src={university.logoUrl}
@@ -385,9 +490,11 @@ function UniversityCard({
         
         {/* Title and Location */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-[#111827] mb-1 line-clamp-2">
-            {university.name}
-          </h3>
+          <Link href={`/universities/${university.id}`}>
+            <h3 className="text-lg font-semibold text-[#111827] mb-1 line-clamp-2 hover:text-[#2563EB] transition-colors cursor-pointer">
+              {university.name}
+            </h3>
+          </Link>
           <div className="flex items-center gap-2 text-sm text-[#6B7280]">
             <span>{getCountryFlag(university.country)}</span>
             <span className="truncate">{university.city}, {university.country}</span>
@@ -419,7 +526,7 @@ function UniversityCard({
 
       {/* Description */}
       {university.description && (
-        <div className="mb-4">
+        <div className="mb-4 flex-1">
           <p className="text-sm text-[#6B7280]">
             {showFullDescription || !shouldTruncate
               ? university.description
@@ -436,8 +543,17 @@ function UniversityCard({
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex gap-2">
+      {/* Quick Actions Bar - Clear labeled buttons */}
+      <div className="flex items-center gap-2 mb-4 py-3 border-y border-gray-100">
+        <SaveButton universityId={university.id} variant="labeled" />
+        <div className="w-px h-6 bg-gray-200" />
+        <CompareButton universityId={university.id} variant="labeled" />
+        <div className="w-px h-6 bg-gray-200" />
+        <TrackButton universityId={university.id} universityName={university.name} variant="labeled" />
+      </div>
+
+      {/* Main Action Buttons */}
+      <div className="flex gap-2 mt-auto">
         {/* Visit Website Button */}
         {university.websiteUrl ? (
           <Button

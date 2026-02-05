@@ -46,9 +46,9 @@ export class WebhooksController {
   ) {
     const webhookSecret = this.configService.get<string>('CLERK_WEBHOOK_SECRET');
 
-    // If webhook secret is not configured, skip verification (dev mode)
+    // If webhook secret is configured, verify the webhook signature
     // In production, this should always be verified
-    if (webhookSecret && webhookSecret !== 'whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx') {
+    if (webhookSecret) {
       try {
         const wh = new Webhook(webhookSecret);
         const rawBody = req.rawBody?.toString() || JSON.stringify(body);
