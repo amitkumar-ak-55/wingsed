@@ -22,5 +22,4 @@ export class CreateApplicationDto {
 
   @IsOptional()
   @IsDateString()
-  deadline?: Date;
-}
+  deadline?: string;}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
 import {
   getAdminUniversities,
@@ -157,11 +157,23 @@ export default function AdminUniversitiesPage() {
     fetchUniversities();
   }, [fetchUniversities]);
 
+  const successTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const showSuccess = (msg: string) => {
+    if (successTimeoutRef.current) {
+      clearTimeout(successTimeoutRef.current);
+    }
     setSuccessMsg(msg);
-    setTimeout(() => setSuccessMsg(null), 3000);
+    successTimeoutRef.current = setTimeout(() => setSuccessMsg(null), 3000);
   };
 
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, []);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
@@ -870,9 +882,8 @@ export default function AdminUniversitiesPage() {
                       <Input type="number" value={programForm.toeflMinScore} onChange={(e) => updateProgramField("toeflMinScore", e.target.value)} min="0" max="120" placeholder="e.g. 100" />
                     </Field>
                     <Field label="Min GPA">
-                      <Input type="number" value={programForm.gpaMinScore} onChange={(e) => updateProgramField("gpaMinScore", e.target.value)} min="0" max="4" step="0.1" placeholder="e.g. 3.5" />
-                    </Field>
-                  </div>
+                      <Input type="number" value={programForm.gpaMinScore} onChange={(e) => updateProgramField("gpaMinScore", e.target.value)} min="0" max="10" step="0.01" placeholder="e.g. 3.5" />
+                    </Field>                  </div>
                 </div>
               </form>
             </div>

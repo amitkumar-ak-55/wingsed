@@ -23,9 +23,8 @@ export class UpdateApplicationDto {
 
   @IsOptional()
   @IsDateString()
-  deadline?: Date;
+  deadline?: string;
 
   @IsOptional()
   @IsDateString()
-  appliedAt?: Date;
-}
+  appliedAt?: string;}

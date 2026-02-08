@@ -8,6 +8,7 @@ import {
   Min,
   Max,
   MaxLength,
+  IsISO8601,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { DegreeType } from '@prisma/client';
@@ -43,8 +44,7 @@ export class CreateProgramDto {
   description?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(100)
+  @IsISO8601()
   applicationDeadline?: string;
 
   @IsOptional()

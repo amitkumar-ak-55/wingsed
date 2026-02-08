@@ -1,6 +1,9 @@
-import { IsIn } from 'class-validator';
+import { IsIn, IsNotEmpty } from 'class-validator';
 
 export class UpdateUserRoleDto {
-  @IsIn(['STUDENT', 'ADMIN', 'COUNSELOR'])
-  role: 'STUDENT' | 'ADMIN' | 'COUNSELOR';
+	static readonly ROLE_VALUES = ['STUDENT', 'ADMIN', 'COUNSELOR'] as const;
+
+	@IsNotEmpty()
+	@IsIn(UpdateUserRoleDto.ROLE_VALUES)
+	role: typeof UpdateUserRoleDto.ROLE_VALUES[number];
 }

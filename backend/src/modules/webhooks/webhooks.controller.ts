@@ -50,9 +50,9 @@ export class WebhooksController {
 
     // Webhook signature verification is MANDATORY
     if (!webhookSecret) {
-      throw new BadRequestException('Webhook secret is not configured — rejecting all webhook calls');
+      console.error('CLERK_WEBHOOK_SECRET is not configured - rejecting webhook call');
+      throw new BadRequestException('Webhook verification failed');
     }
-
     try {
       const wh = new Webhook(webhookSecret);
       const rawBody = req.rawBody?.toString() || JSON.stringify(body);

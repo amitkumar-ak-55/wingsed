@@ -6,7 +6,17 @@ const prisma = new PrismaClient();
 
 // Read universities from JSON file (single source of truth)
 const universitiesPath = path.join(__dirname, '../data/universities.json');
-const rawData = JSON.parse(fs.readFileSync(universitiesPath, 'utf-8'));
+
+function loadUniversityData(): RawUniversity[] {
+  if (!fs.existsSync(universitiesPath)) {
+    throw new Error(`Seed data file not found: ${universitiesPath}`);
+  }
+  try {
+    return JSON.parse(fs.readFileSync(universitiesPath, 'utf-8'));
+  } catch (e) {
+    throw new Error(`Failed to parse universities.json: ${(e as Error).message}`);
+  }
+}
 
 interface RawProgram {
   name: string;
@@ -51,8 +61,25 @@ interface RawUniversity {
   programs?: RawProgram[];
 }
 
+function validateCampusType(value: string | undefined): CampusType | undefined {
+  if (!value) return undefined;
+  if (!Object.values(CampusType).includes(value as CampusType)) {
+    throw new Error(`Invalid campusType: ${value}`);
+  }
+  return value as CampusType;
+}
+
+function validateDegreeType(value: string): DegreeType {
+  if (!Object.values(DegreeType).includes(value as DegreeType)) {
+    throw new Error(`Invalid degreeType: ${value}`);
+  }
+  return value as DegreeType;
+}
+
 async function main() {
   console.log('🌱 Starting database seed...');
+
+  const rawData = loadUniversityData();
 
   // Clear existing data (programs cascade-deleted with universities)
   await prisma.program.deleteMany();
@@ -62,20 +89,18 @@ async function main() {
   let totalPrograms = 0;
 
   // Insert each university with its programs
-  for (const raw of rawData as RawUniversity[]) {
+  for (const raw of rawData) {
     const { programs, ...universityData } = raw;
 
     const university = await prisma.university.create({
       data: {
         ...universityData,
-        campusType: universityData.campusType
-          ? (universityData.campusType as CampusType)
-          : undefined,
+        campusType: validateCampusType(universityData.campusType),
         programs: programs
           ? {
               create: programs.map((p) => ({
                 name: p.name,
-                degreeType: p.degreeType as DegreeType,
+                degreeType: validateDegreeType(p.degreeType),
                 department: p.department,
                 duration: p.duration,
                 tuitionFee: p.tuitionFee,
@@ -105,7 +130,7 @@ async function main() {
   console.log(`\n✅ Seeded ${rawData.length} universities with ${totalPrograms} programs`);
 
   // Log summary by country
-  const countByCountry = (rawData as RawUniversity[]).reduce(
+  const countByCountry = rawData.reduce(
     (acc: Record<string, number>, uni) => {
       acc[uni.country] = (acc[uni.country] || 0) + 1;
       return acc;

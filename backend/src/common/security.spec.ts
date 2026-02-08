@@ -312,10 +312,14 @@ describe('Security: Input Validation & Injection Prevention', () => {
         country: 'US',
         __proto__: { isAdmin: true },
       };
-      const errors = await validateDto(CreateWhatsAppLeadDto, malicious);
-      // __proto__ is stripped by class-transformer or rejected by forbidNonWhitelisted
-      // This test mainly ensures no crash
-      expect(true).toBe(true);
+      const instance = plainToInstance(CreateWhatsAppLeadDto, malicious);
+      const errors = await validate(instance, {
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      });
+      // Verify __proto__ injection didn't add isAdmin to prototype chain
+      expect((instance as any).isAdmin).toBeUndefined();
+      // Either errors or stripped - both are acceptable security outcomes
     });
   });
 
@@ -571,10 +575,11 @@ describe('Security: Error Response Safety', () => {
     // The ErrorResponse interface should NOT include a 'stack' field
     // exception.stack is used in console.error (server-side logging) which is fine
     // But it should never appear in the response object sent to the client
-    const responseBlock = filterCode.substring(filterCode.indexOf('const errorResponse'));
+    const responseStartIndex = filterCode.indexOf('const errorResponse');
+    expect(responseStartIndex).toBeGreaterThan(-1); // Ensure pattern exists
+    const responseBlock = filterCode.substring(responseStartIndex);
     expect(responseBlock).not.toContain('stack');
-  });
-});
+  });});
 
 describe('Security: Validation Pipe Configuration', () => {
   it('should have whitelist and forbidNonWhitelisted enabled', () => {

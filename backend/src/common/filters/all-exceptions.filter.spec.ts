@@ -114,9 +114,8 @@ describe('AllExceptionsFilter', () => {
       expect(responseBody.timestamp).toBeDefined();
       expect(responseBody.path).toBe('/api/test');
       // Timestamp should be a valid ISO string
-      expect(() => new Date(responseBody.timestamp)).not.toThrow();
+      expect(new Date(responseBody.timestamp).getTime()).not.toBeNaN();
     });
-
     it('should handle HttpException with null response object values', () => {
       const exception = new HttpException(
         { message: null, error: null },
