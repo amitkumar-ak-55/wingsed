@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, CampusType, DegreeType } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -6,27 +6,112 @@ const prisma = new PrismaClient();
 
 // Read universities from JSON file (single source of truth)
 const universitiesPath = path.join(__dirname, '../data/universities.json');
-const universities = JSON.parse(fs.readFileSync(universitiesPath, 'utf-8'));
+const rawData = JSON.parse(fs.readFileSync(universitiesPath, 'utf-8'));
+
+interface RawProgram {
+  name: string;
+  degreeType: string;
+  department?: string;
+  duration?: string;
+  tuitionFee?: number;
+  description?: string;
+  applicationDeadline?: string;
+  intakes?: string[];
+  greRequired?: boolean;
+  greMinScore?: number;
+  gmatRequired?: boolean;
+  gmatMinScore?: number;
+  ieltsMinScore?: number;
+  toeflMinScore?: number;
+  gpaMinScore?: number;
+}
+
+interface RawUniversity {
+  name: string;
+  country: string;
+  city: string;
+  tuitionFee: number;
+  publicPrivate: string;
+  logoUrl?: string;
+  imageUrl?: string;
+  websiteUrl?: string;
+  description?: string;
+  address?: string;
+  qsRanking?: number;
+  timesRanking?: number;
+  usNewsRanking?: number;
+  acceptanceRate?: number;
+  applicationFee?: number;
+  campusType?: string;
+  totalStudents?: number;
+  internationalStudentPercent?: number;
+  foodHousingCost?: number;
+  avgScholarshipAmount?: number;
+  employmentRate?: number;
+  programs?: RawProgram[];
+}
 
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Clear existing universities
+  // Clear existing data (programs cascade-deleted with universities)
+  await prisma.program.deleteMany();
   await prisma.university.deleteMany();
-  console.log('🗑️  Cleared existing universities');
+  console.log('🗑️  Cleared existing universities and programs');
 
-  // Insert universities
-  const result = await prisma.university.createMany({
-    data: universities,
-  });
+  let totalPrograms = 0;
 
-  console.log(`✅ Seeded ${result.count} universities`);
+  // Insert each university with its programs
+  for (const raw of rawData as RawUniversity[]) {
+    const { programs, ...universityData } = raw;
+
+    const university = await prisma.university.create({
+      data: {
+        ...universityData,
+        campusType: universityData.campusType
+          ? (universityData.campusType as CampusType)
+          : undefined,
+        programs: programs
+          ? {
+              create: programs.map((p) => ({
+                name: p.name,
+                degreeType: p.degreeType as DegreeType,
+                department: p.department,
+                duration: p.duration,
+                tuitionFee: p.tuitionFee,
+                description: p.description,
+                applicationDeadline: p.applicationDeadline
+                  ? new Date(p.applicationDeadline)
+                  : undefined,
+                intakes: p.intakes || [],
+                greRequired: p.greRequired ?? false,
+                greMinScore: p.greMinScore,
+                gmatRequired: p.gmatRequired ?? false,
+                gmatMinScore: p.gmatMinScore,
+                ieltsMinScore: p.ieltsMinScore,
+                toeflMinScore: p.toeflMinScore,
+                gpaMinScore: p.gpaMinScore,
+              })),
+            }
+          : undefined,
+      },
+    });
+
+    const programCount = programs?.length ?? 0;
+    totalPrograms += programCount;
+    console.log(`  ✅ ${university.name} (${programCount} programs)`);
+  }
+
+  console.log(`\n✅ Seeded ${rawData.length} universities with ${totalPrograms} programs`);
 
   // Log summary by country
-  const countByCountry = universities.reduce((acc: Record<string, number>, uni: { country: string }) => {
-    acc[uni.country] = (acc[uni.country] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const countByCountry = (rawData as RawUniversity[]).reduce(
+    (acc: Record<string, number>, uni) => {
+      acc[uni.country] = (acc[uni.country] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   console.log('\n📊 Universities by country:');
   Object.entries(countByCountry)

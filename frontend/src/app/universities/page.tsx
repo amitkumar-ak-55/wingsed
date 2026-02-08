@@ -462,134 +462,150 @@ function UniversityCard({
   university: University;
   profile?: StudentProfile | null;
 }) {
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const descriptionThreshold = 120; // characters before truncating
-  const shouldTruncate = university.description && university.description.length > descriptionThreshold;
+  const programCount = university.programs?.length || 0;
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow duration-300 animate-fadeIn flex flex-col">
-      {/* Header with Logo */}
-      <div className="flex items-start gap-4 mb-4">
-        {/* Logo */}
-        <div className="w-14 h-14 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-          {university.logoUrl ? (
-            <img
-              src={university.logoUrl}
-              alt={`${university.name} logo`}
-              className="w-full h-full object-contain p-2"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-          ) : null}
-          <span className={`text-2xl font-bold text-gray-400 ${university.logoUrl ? 'hidden' : ''}`}>
-            {university.name.charAt(0)}
-          </span>
+    <Card className="hover:shadow-lg transition-shadow duration-300 animate-fadeIn flex flex-col overflow-hidden">
+      {/* Banner Image */}
+      {university.imageUrl && (
+        <div className="h-36 w-full overflow-hidden bg-gray-100">
+          <img
+            src={university.imageUrl}
+            alt={`${university.name} campus`}
+            className="w-full h-full object-cover"
+          />
         </div>
-        
-        {/* Title and Location */}
-        <div className="flex-1 min-w-0">
-          <Link href={`/universities/${university.id}`}>
-            <h3 className="text-lg font-semibold text-[#111827] mb-1 line-clamp-2 hover:text-[#2563EB] transition-colors cursor-pointer">
-              {university.name}
-            </h3>
-          </Link>
-          <div className="flex items-center gap-2 text-sm text-[#6B7280]">
-            <span>{getCountryFlag(university.country)}</span>
-            <span className="truncate">{university.city}, {university.country}</span>
+      )}
+
+      <div className="p-5 flex flex-col flex-1">
+        {/* Header with Logo */}
+        <div className="flex items-start gap-3 mb-3">
+          {/* Logo */}
+          <div className="w-12 h-12 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center border border-gray-200">
+            {university.logoUrl ? (
+              <img
+                src={university.logoUrl}
+                alt={`${university.name} logo`}
+                className="w-full h-full object-contain p-1.5"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+            ) : null}
+            <span className={`text-lg font-bold text-gray-400 ${university.logoUrl ? 'hidden' : ''}`}>
+              {university.name.charAt(0)}
+            </span>
+          </div>
+          
+          {/* Title & Location */}
+          <div className="flex-1 min-w-0">
+            <Link href={`/universities/${university.id}`}>
+              <h3 className="text-base font-semibold text-[#111827] line-clamp-2 hover:text-[#2563EB] transition-colors cursor-pointer leading-tight">
+                {university.name}
+              </h3>
+            </Link>
+            <p className="text-xs text-[#6B7280] mt-0.5">
+              {getCountryFlag(university.country)} {university.city}, {university.country}
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* Badge */}
-      {university.publicPrivate && (
-        <div className="mb-3">
-          <span className={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${university.publicPrivate === 'Public' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'}`}>
+        {/* Badges Row */}
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {university.qsRanking && (
+            <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              QS #{university.qsRanking}
+            </span>
+          )}
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${university.publicPrivate === 'Public' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-purple-50 text-purple-700 border border-purple-200'}`}>
             {university.publicPrivate}
           </span>
-        </div>
-      )}
-
-      {/* Fees */}
-      <div className="mb-4 p-3 bg-[#F9FAFB] rounded-lg">
-        <div className="text-xs text-[#6B7280] mb-1">Annual Tuition</div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg font-bold text-[#111827]">
-            {formatUSD(university.tuitionFee)}
-          </span>
-          <span className="text-sm text-[#6B7280]">
-            ({formatINR(university.tuitionFee * 83)})
-          </span>
-        </div>
-      </div>
-
-      {/* Description */}
-      {university.description && (
-        <div className="mb-4 flex-1">
-          <p className="text-sm text-[#6B7280]">
-            {showFullDescription || !shouldTruncate
-              ? university.description
-              : `${university.description.slice(0, descriptionThreshold)}...`}
-          </p>
-          {shouldTruncate && (
-            <button
-              onClick={() => setShowFullDescription(!showFullDescription)}
-              className="text-sm text-[#2563EB] hover:text-[#1D4ED8] font-medium mt-1"
-            >
-              {showFullDescription ? "See less" : "See more"}
-            </button>
+          {programCount > 0 && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              {programCount} program{programCount !== 1 ? 's' : ''}
+            </span>
           )}
         </div>
-      )}
 
-      {/* Quick Actions Bar - Clear labeled buttons */}
-      <div className="flex items-center gap-2 mb-4 py-3 border-y border-gray-100">
-        <SaveButton universityId={university.id} variant="labeled" />
-        <div className="w-px h-6 bg-gray-200" />
-        <CompareButton universityId={university.id} variant="labeled" />
-        <div className="w-px h-6 bg-gray-200" />
-        <TrackButton universityId={university.id} universityName={university.name} variant="labeled" />
-      </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="bg-[#F9FAFB] rounded-lg p-2.5">
+            <div className="text-xs text-[#6B7280] mb-0.5">Annual Tuition</div>
+            <div className="text-sm font-bold text-[#111827]">{formatUSD(university.tuitionFee)}</div>
+            <div className="text-xs text-[#6B7280]">{formatINR(university.tuitionFee * 83)}</div>
+          </div>
+          {university.acceptanceRate != null ? (
+            <div className="bg-[#F9FAFB] rounded-lg p-2.5">
+              <div className="text-xs text-[#6B7280] mb-0.5">Acceptance Rate</div>
+              <div className="text-sm font-bold text-[#111827]">{(university.acceptanceRate * 100).toFixed(0)}%</div>
+            </div>
+          ) : university.employmentRate != null ? (
+            <div className="bg-[#F9FAFB] rounded-lg p-2.5">
+              <div className="text-xs text-[#6B7280] mb-0.5">Employment Rate</div>
+              <div className="text-sm font-bold text-green-700">{(university.employmentRate * 100).toFixed(0)}%</div>
+            </div>
+          ) : (
+            <div className="bg-[#F9FAFB] rounded-lg p-2.5">
+              <div className="text-xs text-[#6B7280] mb-0.5">Type</div>
+              <div className="text-sm font-bold text-[#111827]">{university.campusType || "—"}</div>
+            </div>
+          )}
+        </div>
 
-      {/* Main Action Buttons */}
-      <div className="flex gap-2 mt-auto">
-        {/* Visit Website Button */}
-        {university.websiteUrl ? (
+        {/* Extra stats row */}
+        {(university.acceptanceRate != null && university.employmentRate != null) && (
+          <div className="flex items-center gap-3 text-xs text-[#6B7280] mb-3">
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              {(university.employmentRate * 100).toFixed(0)}% employment
+            </span>
+            {university.totalStudents && (
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                {university.totalStudents.toLocaleString()} students
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Description */}
+        {university.description && (
+          <p className="text-xs text-[#6B7280] mb-3 line-clamp-2 flex-1">{university.description}</p>
+        )}
+
+        {/* Quick Actions Bar */}
+        <div className="flex items-center gap-2 mb-3 py-2.5 border-y border-gray-100">
+          <SaveButton universityId={university.id} variant="labeled" />
+          <div className="w-px h-5 bg-gray-200" />
+          <CompareButton universityId={university.id} variant="labeled" />
+          <div className="w-px h-5 bg-gray-200" />
+          <TrackButton universityId={university.id} universityName={university.name} variant="labeled" />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mt-auto">
+          <Link href={`/universities/${university.id}`} className="flex-1">
+            <Button variant="outline" size="sm" className="w-full">
+              View Details
+            </Button>
+          </Link>
           <Button
-            variant="outline"
+            variant="primary"
             size="sm"
             className="flex-1"
             onClick={() => {
-              window.open(university.websiteUrl!, "_blank", "noopener,noreferrer");
+              const message = `Hi, I'm interested in ${university.name} in ${university.country}. Can you tell me more about admission requirements and application process?`;
+              const whatsappUrl = `https://wa.me/918658805653?text=${encodeURIComponent(message)}`;
+              window.open(whatsappUrl, "_blank", "noopener,noreferrer");
             }}
           >
-            Visit Website
+            WhatsApp Us
           </Button>
-        ) : (
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            disabled
-          >
-            No Website
-          </Button>
-        )}
-        
-        {/* WhatsApp Button */}
-        <Button
-          variant="primary"
-          size="sm"
-          className="flex-1"
-          onClick={() => {
-            const message = `Hi, I'm interested in ${university.name} in ${university.country}. Can you tell me more about admission requirements and application process?`;
-            const whatsappUrl = `https://wa.me/918658805653?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-          }}
-        >
-          WhatsApp Us
-        </Button>
+        </div>
       </div>
     </Card>
   );

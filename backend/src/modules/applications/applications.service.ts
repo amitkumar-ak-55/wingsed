@@ -1,23 +1,10 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Application, ApplicationStatus, University } from '@prisma/client';
+import { CreateApplicationDto } from './dto/create-application.dto';
+import { UpdateApplicationDto } from './dto/update-application.dto';
 
-export interface CreateApplicationDto {
-  universityId: string;
-  program?: string;
-  intake?: string;
-  notes?: string;
-  deadline?: Date;
-}
-
-export interface UpdateApplicationDto {
-  status?: ApplicationStatus;
-  program?: string;
-  intake?: string;
-  notes?: string;
-  deadline?: Date;
-  appliedAt?: Date;
-}
+export { CreateApplicationDto, UpdateApplicationDto };
 
 @Injectable()
 export class ApplicationsService {

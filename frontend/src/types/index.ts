@@ -42,6 +42,44 @@ export interface University {
   logoUrl: string | null;
   websiteUrl: string | null;
   description: string | null;
+  // New fields from Phase 1
+  imageUrl: string | null;
+  address: string | null;
+  qsRanking: number | null;
+  timesRanking: number | null;
+  usNewsRanking: number | null;
+  acceptanceRate: number | null;
+  applicationFee: number | null;
+  campusType: "URBAN" | "SUBURBAN" | "RURAL" | null;
+  totalStudents: number | null;
+  internationalStudentPercent: number | null;
+  foodHousingCost: number | null;
+  avgScholarshipAmount: number | null;
+  employmentRate: number | null;
+  // Relations
+  programs?: Program[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Program {
+  id: string;
+  universityId: string;
+  name: string;
+  degreeType: "BACHELORS" | "MASTERS" | "PHD" | "DIPLOMA" | "CERTIFICATE";
+  department: string | null;
+  duration: string | null;
+  tuitionFee: number | null;
+  description: string | null;
+  applicationDeadline: string | null;
+  intakes: string[];
+  greRequired: boolean;
+  greMinScore: number | null;
+  gmatRequired: boolean;
+  gmatMinScore: number | null;
+  ieltsMinScore: number | null;
+  toeflMinScore: number | null;
+  gpaMinScore: number | null;
   createdAt: string;
   updatedAt: string;
 }

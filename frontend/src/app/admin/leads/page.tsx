@@ -36,6 +36,7 @@ export default function AdminLeadsPage() {
         setLeads(result.data.leads);
         setTotalPages(result.data.totalPages);
         setTotal(result.data.total);
+        setError(null);
       } else {
         setError(result.error || "Failed to load leads");
       }
@@ -48,12 +49,12 @@ export default function AdminLeadsPage() {
 
   useEffect(() => {
     fetchLeads();
-  }, [getToken, page, countryFilter, feedbackFilter]);
+  }, [getToken, page, search, countryFilter, feedbackFilter]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchLeads();
+    // useEffect will trigger fetchLeads when page/search changes
   };
 
   const handleDelete = async (id: string) => {
@@ -63,8 +64,12 @@ export default function AdminLeadsPage() {
       const token = await getToken();
       if (!token) return;
 
-      await deleteAdminLead(token, id);
-      fetchLeads();
+      const result = await deleteAdminLead(token, id);
+      if (result.error) {
+        alert(result.error);
+      } else {
+        fetchLeads();
+      }
     } catch (err) {
       alert("Failed to delete lead");
     }
@@ -110,7 +115,9 @@ export default function AdminLeadsPage() {
           </form>
 
           {/* Country Filter */}
+          <label className="sr-only" htmlFor="country-filter">Filter by country</label>
           <select
+            id="country-filter"
             value={countryFilter}
             onChange={(e) => {
               setCountryFilter(e.target.value);
@@ -128,7 +135,9 @@ export default function AdminLeadsPage() {
           </select>
 
           {/* Feedback Filter */}
+          <label className="sr-only" htmlFor="feedback-filter">Filter by feedback status</label>
           <select
+            id="feedback-filter"
             value={feedbackFilter}
             onChange={(e) => {
               setFeedbackFilter(e.target.value);
@@ -220,8 +229,12 @@ export default function AdminLeadsPage() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="text-sm text-[#111827]">
-                        {lead.budgetMin || lead.budgetMax
-                          ? `${formatINR(lead.budgetMin || 0)} - ${formatINR(lead.budgetMax || 0)}`
+                        {lead.budgetMin && lead.budgetMax
+                          ? `${formatINR(lead.budgetMin)} - ${formatINR(lead.budgetMax)}`
+                          : lead.budgetMin
+                          ? `From ${formatINR(lead.budgetMin)}`
+                          : lead.budgetMax
+                          ? `Up to ${formatINR(lead.budgetMax)}`
                           : "—"}
                       </div>
                     </td>
@@ -239,7 +252,7 @@ export default function AdminLeadsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-4 text-sm text-[#6B7280]">
-                      {formatDate(lead.redirectedAt)}
+                      {lead.redirectedAt ? formatDate(lead.redirectedAt) : "—"}
                     </td>
                     <td className="px-4 py-4 text-right">
                       <button

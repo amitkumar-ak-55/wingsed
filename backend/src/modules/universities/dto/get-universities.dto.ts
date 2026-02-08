@@ -4,12 +4,14 @@ import {
   IsInt,
   Min,
   Max,
+  MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class GetUniversitiesDto {
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   country?: string;
 
   @IsOptional()
@@ -26,6 +28,7 @@ export class GetUniversitiesDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   search?: string;
 
   @IsOptional()

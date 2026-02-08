@@ -69,6 +69,7 @@ export class UniversitiesService {
       orderBy: { name: 'asc' },
       skip: (page - 1) * pageSize,
       take: pageSize,
+      include: { programs: true },
     });
 
     return {
@@ -81,11 +82,12 @@ export class UniversitiesService {
   }
 
   /**
-   * Get a single university by ID
+   * Get a single university by ID with programs
    */
-  async findById(id: string): Promise<University | null> {
+  async findById(id: string) {
     return this.prisma.university.findUnique({
       where: { id },
+      include: { programs: true },
     });
   }
 

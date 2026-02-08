@@ -11,7 +11,8 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { AdminService, CreateUniversityDto, UpdateUniversityDto } from './admin.service';
+import { AdminService } from './admin.service';
+import { CreateUniversityDto, UpdateUniversityDto, CreateProgramDto, UpdateProgramDto, UpdateUserRoleDto } from './dto';
 import { ClerkAuthGuard } from '../../common/guards/clerk-auth.guard';
 import { AdminGuard } from '../../common/guards/admin.guard';
 
@@ -111,6 +112,43 @@ export class AdminController {
     await this.adminService.deleteUniversity(id);
   }
 
+  @Get('universities/:id')
+  @HttpCode(HttpStatus.OK)
+  async getUniversityById(@Param('id') id: string) {
+    const university = await this.adminService.getUniversityById(id);
+    return { university };
+  }
+
+  // ===========================================
+  // Programs
+  // ===========================================
+
+  @Post('universities/:universityId/programs')
+  @HttpCode(HttpStatus.CREATED)
+  async createProgram(
+    @Param('universityId') universityId: string,
+    @Body() dto: CreateProgramDto,
+  ) {
+    const program = await this.adminService.createProgram(universityId, dto);
+    return { program };
+  }
+
+  @Patch('programs/:id')
+  @HttpCode(HttpStatus.OK)
+  async updateProgram(
+    @Param('id') id: string,
+    @Body() dto: UpdateProgramDto,
+  ) {
+    const program = await this.adminService.updateProgram(id, dto);
+    return { program };
+  }
+
+  @Delete('programs/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteProgram(@Param('id') id: string) {
+    await this.adminService.deleteProgram(id);
+  }
+
   // ===========================================
   // Users
   // ===========================================
@@ -136,9 +174,9 @@ export class AdminController {
   @HttpCode(HttpStatus.OK)
   async updateUserRole(
     @Param('id') id: string,
-    @Body('role') role: 'STUDENT' | 'ADMIN' | 'COUNSELOR',
+    @Body() dto: UpdateUserRoleDto,
   ) {
-    const user = await this.adminService.updateUserRole(id, role);
+    const user = await this.adminService.updateUserRole(id, dto.role);
     return { user };
   }
 }

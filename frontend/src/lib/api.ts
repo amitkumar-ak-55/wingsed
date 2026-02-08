@@ -2,7 +2,7 @@
 // API Client with Security Best Practices
 // ===========================================
 
-import type { User, University } from "@/types";
+import type { User, University, Program } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -570,6 +570,19 @@ export async function createAdminUniversity(token: string, data: {
   logoUrl?: string;
   websiteUrl?: string;
   description?: string;
+  imageUrl?: string;
+  address?: string;
+  qsRanking?: number;
+  timesRanking?: number;
+  usNewsRanking?: number;
+  acceptanceRate?: number;
+  applicationFee?: number;
+  campusType?: string;
+  totalStudents?: number;
+  internationalStudentPercent?: number;
+  foodHousingCost?: number;
+  avgScholarshipAmount?: number;
+  employmentRate?: number;
 }) {
   return apiClient<{ university: University }>('/admin/universities', {
     method: 'POST',
@@ -578,16 +591,7 @@ export async function createAdminUniversity(token: string, data: {
   });
 }
 
-export async function updateAdminUniversity(token: string, id: string, data: {
-  name?: string;
-  country?: string;
-  city?: string;
-  tuitionFee?: number;
-  publicPrivate?: string;
-  logoUrl?: string;
-  websiteUrl?: string;
-  description?: string;
-}) {
+export async function updateAdminUniversity(token: string, id: string, data: Record<string, unknown>) {
   return apiClient<{ university: University }>(`/admin/universities/${id}`, {
     method: 'PATCH',
     body: data,
@@ -597,6 +601,31 @@ export async function updateAdminUniversity(token: string, id: string, data: {
 
 export async function deleteAdminUniversity(token: string, id: string) {
   return apiClient(`/admin/universities/${id}`, { method: 'DELETE', token });
+}
+
+export async function getAdminUniversityById(token: string, id: string) {
+  return apiClient<{ university: University }>(`/admin/universities/${id}`, { token });
+}
+
+// Admin Programs
+export async function createAdminProgram(token: string, universityId: string, data: Record<string, unknown>) {
+  return apiClient<{ program: Program }>(`/admin/universities/${universityId}/programs`, {
+    method: 'POST',
+    body: data,
+    token,
+  });
+}
+
+export async function updateAdminProgram(token: string, programId: string, data: Record<string, unknown>) {
+  return apiClient<{ program: Program }>(`/admin/programs/${programId}`, {
+    method: 'PATCH',
+    body: data,
+    token,
+  });
+}
+
+export async function deleteAdminProgram(token: string, programId: string) {
+  return apiClient(`/admin/programs/${programId}`, { method: 'DELETE', token });
 }
 
 // Admin Users

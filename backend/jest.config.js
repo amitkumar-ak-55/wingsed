@@ -37,10 +37,10 @@ module.exports = {
   // Lower threshold accounts for webhooks/typesense which require external services
   coverageThreshold: {
     global: {
-      branches: 35,
-      functions: 50,
-      lines: 45,
-      statements: 45,
+      branches: 80,
+      functions: 90,
+      lines: 90,
+      statements: 90,
     },
   },
   

@@ -102,7 +102,7 @@ describe('UniversitiesService', () => {
       expect(prisma.university.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            tuitionFee: { gte: 20000, lte: 40000 },
+            tuitionFee: { gte: Math.floor(20000 / 83), lte: Math.ceil(40000 / 83) },
           }),
         })
       );
@@ -164,6 +164,7 @@ describe('UniversitiesService', () => {
       expect(result).toEqual(mockUniversity);
       expect(prisma.university.findUnique).toHaveBeenCalledWith({
         where: { id: 'uni-123' },
+        include: { programs: true },
       });
     });
 
@@ -219,6 +220,88 @@ describe('UniversitiesService', () => {
       const result = await service.getCount();
 
       expect(result).toBe(0);
+    });
+  });
+
+  // -------------------------------------------
+  // getRecommendations
+  // -------------------------------------------
+  describe('getRecommendations', () => {
+    const mockUniversities = [
+      { ...mockUniversity, id: 'uni-1', name: 'MIT' },
+      { ...mockUniversity, id: 'uni-2', name: 'Stanford' },
+    ];
+
+    it('should return recommendations by preferred country', async () => {
+      // First call: returns 2 matches; second call (fill-up): returns empty
+      prisma.university.findMany
+        .mockResolvedValueOnce(mockUniversities as any)
+        .mockResolvedValueOnce([] as any);
+
+      const result = await service.getRecommendations('United States');
+
+      // 2 from first call + 0 fill-up = 2
+      expect(result).toHaveLength(2);
+      expect(prisma.university.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ country: 'United States' }),
+          take: 6,
+        }),
+      );
+    });
+
+    it('should convert INR budget to USD', async () => {
+      prisma.university.findMany.mockResolvedValue(mockUniversities as any);
+
+      await service.getRecommendations(undefined, 1660000, 4150000);
+
+      const call = prisma.university.findMany.mock.calls[0][0];
+      const tuitionFilter = call?.where?.tuitionFee as any;
+      // 1660000 INR / 83 = 20000 USD, 4150000 / 83 ≈ 50000 USD
+      expect(tuitionFilter?.gte).toBe(Math.floor(1660000 / 83));
+      expect(tuitionFilter?.lte).toBe(Math.ceil(4150000 / 83));
+    });
+
+    it('should fill with additional universities when not enough matches', async () => {
+      // First call returns only 2 results (under default limit of 6)
+      prisma.university.findMany
+        .mockResolvedValueOnce([mockUniversities[0]] as any)
+        .mockResolvedValueOnce([
+          { ...mockUniversity, id: 'uni-extra-1' },
+          { ...mockUniversity, id: 'uni-extra-2' },
+        ] as any);
+
+      const result = await service.getRecommendations('Australia', undefined, undefined, 3);
+
+      expect(result).toHaveLength(3);
+      // Second call should exclude already-found IDs
+      expect(prisma.university.findMany).toHaveBeenCalledTimes(2);
+      const secondCall = prisma.university.findMany.mock.calls[1][0];
+      const idFilter = secondCall?.where?.id as any;
+      expect(idFilter?.notIn).toContain('uni-1');
+    });
+
+    it('should return up to limit universities', async () => {
+      const fiveUnis = Array.from({ length: 5 }, (_, i) => ({
+        ...mockUniversity,
+        id: `uni-${i}`,
+      }));
+      prisma.university.findMany.mockResolvedValue(fiveUnis as any);
+
+      const result = await service.getRecommendations(undefined, undefined, undefined, 5);
+
+      expect(result).toHaveLength(5);
+    });
+
+    it('should handle no filters (return all up to limit)', async () => {
+      // First call: 2 results; second call (fill-up): no more
+      prisma.university.findMany
+        .mockResolvedValueOnce(mockUniversities as any)
+        .mockResolvedValueOnce([] as any);
+
+      const result = await service.getRecommendations();
+
+      expect(result).toHaveLength(2);
     });
   });
 });

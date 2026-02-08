@@ -1,29 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { University, WhatsAppLead, User } from '@prisma/client';
+import { University, WhatsAppLead, User, CampusType, DegreeType } from '@prisma/client';
+import { CreateUniversityDto, UpdateUniversityDto, CreateProgramDto, UpdateProgramDto } from './dto';
 
-// DTOs
-export interface CreateUniversityDto {
-  name: string;
-  country: string;
-  city: string;
-  tuitionFee: number;
-  publicPrivate: string;
-  logoUrl?: string;
-  websiteUrl?: string;
-  description?: string;
-}
-
-export interface UpdateUniversityDto {
-  name?: string;
-  country?: string;
-  city?: string;
-  tuitionFee?: number;
-  publicPrivate?: string;
-  logoUrl?: string;
-  websiteUrl?: string;
-  description?: string;
-}
+export { CreateUniversityDto, UpdateUniversityDto, CreateProgramDto, UpdateProgramDto };
 
 export interface DashboardStats {
   totalLeads: number;
@@ -190,11 +170,14 @@ export class AdminService {
   // Universities Management
   // ===========================================
 
-  async createUniversity(data: CreateUniversityDto): Promise<University> {
-    return this.prisma.university.create({ data });
+  async createUniversity(data: CreateUniversityDto) {
+    return this.prisma.university.create({
+      data,
+      include: { programs: true },
+    });
   }
 
-  async updateUniversity(id: string, data: UpdateUniversityDto): Promise<University> {
+  async updateUniversity(id: string, data: UpdateUniversityDto) {
     const existing = await this.prisma.university.findUnique({ where: { id } });
     
     if (!existing) {
@@ -204,6 +187,7 @@ export class AdminService {
     return this.prisma.university.update({
       where: { id },
       data,
+      include: { programs: true },
     });
   }
 
@@ -214,11 +198,23 @@ export class AdminService {
       throw new NotFoundException('University not found');
     }
 
-    // Delete related records first (saved universities, applications)
+    // Delete related records first (programs, saved universities, applications)
+    await this.prisma.program.deleteMany({ where: { universityId: id } });
     await this.prisma.savedUniversity.deleteMany({ where: { universityId: id } });
     await this.prisma.application.deleteMany({ where: { universityId: id } });
     
     await this.prisma.university.delete({ where: { id } });
+  }
+
+  async getUniversityById(id: string) {
+    const university = await this.prisma.university.findUnique({
+      where: { id },
+      include: { programs: true },
+    });
+    if (!university) {
+      throw new NotFoundException('University not found');
+    }
+    return university;
   }
 
   async getAllUniversities(options?: {
@@ -226,7 +222,7 @@ export class AdminService {
     limit?: number;
     search?: string;
     country?: string;
-  }): Promise<{ universities: University[]; total: number; page: number; totalPages: number }> {
+  }) {
     const page = options?.page || 1;
     const limit = options?.limit || 20;
     const skip = (page - 1) * limit;
@@ -250,6 +246,7 @@ export class AdminService {
         orderBy: { name: 'asc' },
         skip,
         take: limit,
+        include: { programs: true },
       }),
       this.prisma.university.count({ where }),
     ]);
@@ -260,6 +257,48 @@ export class AdminService {
       page,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  // ===========================================
+  // Programs Management
+  // ===========================================
+
+  async createProgram(universityId: string, data: CreateProgramDto) {
+    // Verify university exists
+    await this.getUniversityById(universityId);
+
+    return this.prisma.program.create({
+      data: {
+        ...data,
+        universityId,
+        applicationDeadline: data.applicationDeadline ? new Date(data.applicationDeadline) : undefined,
+      },
+    });
+  }
+
+  async updateProgram(programId: string, data: UpdateProgramDto) {
+    const existing = await this.prisma.program.findUnique({ where: { id: programId } });
+    if (!existing) {
+      throw new NotFoundException('Program not found');
+    }
+
+    const updateData: any = { ...data };
+    if (data.applicationDeadline !== undefined) {
+      updateData.applicationDeadline = data.applicationDeadline ? new Date(data.applicationDeadline) : null;
+    }
+
+    return this.prisma.program.update({
+      where: { id: programId },
+      data: updateData,
+    });
+  }
+
+  async deleteProgram(programId: string): Promise<void> {
+    const existing = await this.prisma.program.findUnique({ where: { id: programId } });
+    if (!existing) {
+      throw new NotFoundException('Program not found');
+    }
+    await this.prisma.program.delete({ where: { id: programId } });
   }
 
   // ===========================================
