@@ -48,7 +48,6 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
 
       await api.createApplication(token, {
         universityId,
-        status,
         program: program || undefined,
         intake: intake || undefined,
       });

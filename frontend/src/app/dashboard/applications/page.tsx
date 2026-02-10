@@ -33,6 +33,7 @@ export default function ApplicationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  // Remove custom modal state
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -83,13 +84,10 @@ export default function ApplicationsPage() {
 
   const handleDelete = async (applicationId: string) => {
     if (!confirm("Are you sure you want to delete this application?")) return;
-
     try {
       const token = await getToken();
       if (!token) return;
-
       await api.deleteApplication(token, applicationId);
-      
       // Refresh applications
       const grouped = await api.getApplicationsByStatus(token);
       setApplications(grouped as Record<ApplicationStatus, Application[]>);
@@ -98,7 +96,7 @@ export default function ApplicationsPage() {
     }
   };
 
-  const totalApps = STATUS_ORDER.reduce((sum, status) => sum + applications[status].length, 0);
+  const totalApps = STATUS_ORDER.reduce((sum, status) => sum + (applications[status]?.length || 0), 0);
 
   if (!isLoaded || !isSignedIn) {
     return (
@@ -143,7 +141,7 @@ export default function ApplicationsPage() {
             >
               <div className="text-2xl mb-1">{STATUS_CONFIG[status].icon}</div>
               <div className={`text-2xl font-bold ${STATUS_CONFIG[status].color}`}>
-                {applications[status].length}
+                {(applications[status]?.length || 0)}
               </div>
               <div className="text-sm text-[#6B7280]">{STATUS_CONFIG[status].label}</div>
             </div>
@@ -231,6 +229,7 @@ export default function ApplicationsPage() {
         )}
       </main>
 
+      {/* ConfirmModal removed, using browser confirm() for delete */}
       <Footer />
     </div>
   );

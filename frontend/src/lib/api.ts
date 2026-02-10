@@ -51,12 +51,19 @@ export async function apiClient<T>(
       next: revalidate !== undefined ? { revalidate } : undefined,
     });
 
-    const data = await response.json();
+    let data: any = null;
+    // Only attempt to parse JSON if there is content
+    if (response.status !== 204) {
+      const text = await response.text();
+      if (text) {
+        data = JSON.parse(text);
+      }
+    }
 
     if (!response.ok) {
       return {
         data: null,
-        error: data.message || "An error occurred",
+        error: (data && data.message) || "An error occurred",
         status: response.status,
       };
     }
