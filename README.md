@@ -2,7 +2,7 @@
 
 A minimalist, trust-first web application for Indian students planning to study abroad (postgraduate).
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js 15 (App Router, Server Components)
 - **Styling**: Tailwind CSS, Headless UI
@@ -11,7 +11,7 @@ A minimalist, trust-first web application for Indian students planning to study 
 - **Database**: PostgreSQL with Prisma ORM
 - **Search**: Typesense
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have:
 
@@ -19,7 +19,7 @@ Before you begin, ensure you have:
 - **Docker Desktop** installed and running
 - **Clerk Account** with API keys
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Step 1: Start Docker Services
 
@@ -85,7 +85,7 @@ npm run dev
 
 Frontend runs on `http://localhost:3000`
 
-## 🔐 Environment Variables
+# Environment Variables
 
 ### Backend (.env)
 
@@ -107,7 +107,7 @@ Frontend runs on `http://localhost:3000`
 | `NEXT_PUBLIC_API_URL` | Backend API URL |
 | `NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER` | WhatsApp number |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 wingsed/
@@ -128,7 +128,7 @@ wingsed/
         └── data/          # Testimonials, static data
 ```
 
-## 🗄️ Database Commands
+##  Database Commands
 
 ```bash
 # Generate Prisma client after schema changes
@@ -147,7 +147,7 @@ npx prisma studio
 npx prisma db seed
 ```
 
-## 🔍 Typesense Commands
+##  Typesense Commands
 
 ```bash
 # Sync universities from PostgreSQL to Typesense
@@ -157,7 +157,7 @@ npm run typesense:sync
 npm run typesense:clear
 ```
 
-## 🚢 Deployment
+##  Deployment
 
 ### Frontend (Vercel)
 
