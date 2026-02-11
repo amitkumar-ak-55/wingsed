@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
-import { Header, Footer, WhatsAppButton } from "@/components";
+import { Header, Footer, WhatsAppButton, SaveButton, TrackButton, CompareButton, CompareBar } from "@/components";
 import { Button, Input, Select, Card, Skeleton } from "@/components/ui";
 import { COUNTRIES, BUDGET_RANGES } from "@/data/constants";
-import { api } from "@/lib/api";
+import { api, getRecommendations } from "@/lib/api";
 import { formatINR, formatUSD, getCountryFlag } from "@/lib/utils";
 import type { University, StudentProfile } from "@/types";
 
@@ -19,7 +20,7 @@ interface Filters {
 }
 
 // Debounce utility
-function debounce<T extends (...args: any[]) => any>(fn: T, ms: number) {
+function debounce<T extends (...args: never[]) => void>(fn: T, ms: number) {
   let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
@@ -68,8 +69,10 @@ function UniversitiesContent() {
   const { isLoaded, isSignedIn, getToken } = useAuth();
 
   const [universities, setUniversities] = useState<University[]>([]);
+  const [recommendations, setRecommendations] = useState<University[]>([]);
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingRecs, setIsLoadingRecs] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -82,10 +85,24 @@ function UniversitiesContent() {
     field: searchParams.get("field") || "",
   });
 
-  // Load user profile if signed in
+  // Load user profile and recommendations if signed in
   useEffect(() => {
     const loadProfile = async () => {
-      if (!isSignedIn) return;
+      if (!isSignedIn) {
+        // For guests, load general recommendations
+        setIsLoadingRecs(true);
+        try {
+          const recsResult = await getRecommendations({ limit: 4 });
+          if (recsResult.data?.recommendations) {
+            setRecommendations(recsResult.data.recommendations);
+          }
+        } catch (error) {
+          console.error("Failed to load recommendations:", error);
+        } finally {
+          setIsLoadingRecs(false);
+        }
+        return;
+      }
       
       try {
         const token = await getToken();
@@ -94,6 +111,25 @@ function UniversitiesContent() {
         const user = await api.getCurrentUser(token);
         if (user?.profile) {
           setProfile(user.profile);
+          
+          // Load personalized recommendations
+          setIsLoadingRecs(true);
+          try {
+            const recsResult = await getRecommendations({
+              country: user.profile.preferredCountries?.[0],
+              budgetMin: user.profile.budgetMin ?? undefined,
+              budgetMax: user.profile.budgetMax ?? undefined,
+              limit: 4,
+            });
+            if (recsResult.data?.recommendations) {
+              setRecommendations(recsResult.data.recommendations);
+            }
+          } catch (error) {
+            console.error("Failed to load recommendations:", error);
+          } finally {
+            setIsLoadingRecs(false);
+          }
+
           // Pre-fill filters from profile if no URL params
           if (!searchParams.toString()) {
             const profile = user.profile;
@@ -122,7 +158,7 @@ function UniversitiesContent() {
     try {
       const token = isSignedIn ? await getToken() : null;
       
-      const params: any = {
+      const params: Record<string, string | number> = {
         page: currentPage,
         limit: 12,
       };
@@ -150,6 +186,7 @@ function UniversitiesContent() {
   }, [isSignedIn, getToken]);
 
   // Debounced search
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((currentFilters: Filters) => {
       setPage(1);
@@ -272,6 +309,74 @@ function UniversitiesContent() {
           </div>
         </div>
 
+        {/* Recommendations Section */}
+        {recommendations.length > 0 && !filters.search && !filters.country && !filters.budgetMin && (
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <svg className="w-5 h-5 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+              <h2 className="text-lg font-semibold text-[#111827]">
+                {profile ? "Recommended for You" : "Popular Universities"}
+              </h2>
+              {profile && (
+                <span className="text-xs text-[#6B7280] bg-blue-50 px-2 py-1 rounded-full">
+                  Based on your profile
+                </span>
+              )}
+            </div>
+            {isLoadingRecs ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Skeleton className="w-10 h-10 rounded-lg" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-3/4 mb-1" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-6 w-full" />
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {recommendations.map((uni) => (
+                  <Link key={uni.id} href={`/universities/${uni.id}`}>
+                    <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer h-full">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-10 h-10 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                          {uni.logoUrl ? (
+                            <img
+                              src={uni.logoUrl}
+                              alt={uni.name}
+                              className="w-full h-full object-contain p-1"
+                            />
+                          ) : (
+                            <span className="text-sm font-bold text-gray-400">{uni.name.charAt(0)}</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-semibold text-[#111827] line-clamp-1 hover:text-[#2563EB] transition-colors">
+                            {uni.name}
+                          </h3>
+                          <p className="text-xs text-[#6B7280]">
+                            {getCountryFlag(uni.country)} {uni.city}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-sm font-medium text-[#111827]">
+                        {formatUSD(uni.tuitionFee)}/yr
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Results Count */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-[#6B7280]">
@@ -337,6 +442,7 @@ function UniversitiesContent() {
       </main>
 
       <Footer />
+      <CompareBar />
       <WhatsAppButton
         userData={{
           country: filters.country || undefined,
@@ -352,101 +458,155 @@ function UniversitiesContent() {
 // University Card Component
 function UniversityCard({
   university,
-  profile,
 }: {
   university: University;
-  profile: StudentProfile | null;
+  profile?: StudentProfile | null;
 }) {
-  const { isSignedIn } = useAuth();
+  const programCount = university.programs?.length || 0;
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow duration-300 animate-fadeIn">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-[#111827] mb-1 line-clamp-2">
-            {university.name}
-          </h3>
-          <div className="flex items-center gap-2 text-sm text-[#6B7280]">
-            <span>{getCountryFlag(university.country)}</span>
-            <span>{university.city}, {university.country}</span>
-          </div>
-        </div>
-        {university.qsRanking && (
-          <div className="bg-[#2563EB]/10 text-[#2563EB] text-xs font-semibold px-2 py-1 rounded-full">
-            QS #{university.qsRanking}
-          </div>
-        )}
-      </div>
-
-      {/* Fees */}
-      <div className="mb-4 p-3 bg-[#F9FAFB] rounded-lg">
-        <div className="text-xs text-[#6B7280] mb-1">Annual Tuition</div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg font-bold text-[#111827]">
-            {formatINR(university.avgTuitionInr)}
-          </span>
-          <span className="text-sm text-[#6B7280]">
-            ({formatUSD(university.avgTuitionUsd)})
-          </span>
-        </div>
-      </div>
-
-      {/* Programs */}
-      {university.programsOffered && university.programsOffered.length > 0 && (
-        <div className="mb-4">
-          <div className="text-xs text-[#6B7280] mb-2">Programs</div>
-          <div className="flex flex-wrap gap-1">
-            {university.programsOffered.slice(0, 3).map((program) => (
-              <span
-                key={program}
-                className="text-xs px-2 py-1 bg-[#F3F4F6] text-[#374151] rounded-full"
-              >
-                {program}
-              </span>
-            ))}
-            {university.programsOffered.length > 3 && (
-              <span className="text-xs px-2 py-1 text-[#6B7280]">
-                +{university.programsOffered.length - 3} more
-              </span>
-            )}
-          </div>
+    <Card className="hover:shadow-lg transition-shadow duration-300 animate-fadeIn flex flex-col overflow-hidden">
+      {/* Banner Image */}
+      {university.imageUrl && (
+        <div className="h-36 w-full overflow-hidden bg-gray-100">
+          <img
+            src={university.imageUrl}
+            alt={`${university.name} campus`}
+            className="w-full h-full object-cover"
+          />
         </div>
       )}
 
-      {/* Requirements */}
-      <div className="flex flex-wrap gap-2 mb-4 text-xs text-[#6B7280]">
-        {university.ieltsReq && (
-          <span className="px-2 py-1 bg-[#F9FAFB] rounded">
-            IELTS: {university.ieltsReq}+
-          </span>
-        )}
-        {university.greReq && (
-          <span className="px-2 py-1 bg-[#F9FAFB] rounded">
-            GRE: {university.greReq}+
-          </span>
-        )}
-        {university.gmatReq && (
-          <span className="px-2 py-1 bg-[#F9FAFB] rounded">
-            GMAT: {university.gmatReq}+
-          </span>
-        )}
-      </div>
+      <div className="p-5 flex flex-col flex-1">
+        {/* Header with Logo */}
+        <div className="flex items-start gap-3 mb-3">
+          {/* Logo */}
+          <div className="w-12 h-12 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center border border-gray-200">
+            {university.logoUrl ? (
+              <img
+                src={university.logoUrl}
+                alt={`${university.name} logo`}
+                className="w-full h-full object-contain p-1.5"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+            ) : null}
+            <span className={`text-lg font-bold text-gray-400 ${university.logoUrl ? 'hidden' : ''}`}>
+              {university.name.charAt(0)}
+            </span>
+          </div>
+          
+          {/* Title & Location */}
+          <div className="flex-1 min-w-0">
+            <Link href={`/universities/${university.id}`}>
+              <h3 className="text-base font-semibold text-[#111827] line-clamp-2 hover:text-[#2563EB] transition-colors cursor-pointer leading-tight">
+                {university.name}
+              </h3>
+            </Link>
+            <p className="text-xs text-[#6B7280] mt-0.5">
+              {getCountryFlag(university.country)} {university.city}, {university.country}
+            </p>
+          </div>
+        </div>
 
-      {/* Action */}
-      <Button
-        variant="primary"
-        size="sm"
-        className="w-full"
-        onClick={() => {
-          // Open WhatsApp with university-specific message
-          const message = `Hi, I'm interested in ${university.name} in ${university.country}. Can you tell me more about admission requirements and application process?`;
-          const whatsappUrl = `https://wa.me/918658805653?text=${encodeURIComponent(message)}`;
-          window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-        }}
-      >
-        Learn More on WhatsApp
-      </Button>
+        {/* Badges Row */}
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {university.qsRanking && (
+            <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              QS #{university.qsRanking}
+            </span>
+          )}
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${university.publicPrivate === 'Public' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-purple-50 text-purple-700 border border-purple-200'}`}>
+            {university.publicPrivate}
+          </span>
+          {programCount > 0 && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              {programCount} program{programCount !== 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="bg-[#F9FAFB] rounded-lg p-2.5">
+            <div className="text-xs text-[#6B7280] mb-0.5">Annual Tuition</div>
+            <div className="text-sm font-bold text-[#111827]">{formatUSD(university.tuitionFee)}</div>
+            <div className="text-xs text-[#6B7280]">{formatINR(university.tuitionFee * 83)}</div>
+          </div>
+          {university.acceptanceRate != null ? (
+            <div className="bg-[#F9FAFB] rounded-lg p-2.5">
+              <div className="text-xs text-[#6B7280] mb-0.5">Acceptance Rate</div>
+              <div className="text-sm font-bold text-[#111827]">{(university.acceptanceRate * 100).toFixed(0)}%</div>
+            </div>
+          ) : university.employmentRate != null ? (
+            <div className="bg-[#F9FAFB] rounded-lg p-2.5">
+              <div className="text-xs text-[#6B7280] mb-0.5">Employment Rate</div>
+              <div className="text-sm font-bold text-green-700">{(university.employmentRate * 100).toFixed(0)}%</div>
+            </div>
+          ) : (
+            <div className="bg-[#F9FAFB] rounded-lg p-2.5">
+              <div className="text-xs text-[#6B7280] mb-0.5">Type</div>
+              <div className="text-sm font-bold text-[#111827]">{university.campusType || "—"}</div>
+            </div>
+          )}
+        </div>
+
+        {/* Extra stats row */}
+        {(university.acceptanceRate != null && university.employmentRate != null) && (
+          <div className="flex items-center gap-3 text-xs text-[#6B7280] mb-3">
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              {(university.employmentRate * 100).toFixed(0)}% employment
+            </span>
+            {university.totalStudents && (
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                {university.totalStudents.toLocaleString()} students
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Description */}
+        {university.description && (
+          <p className="text-xs text-[#6B7280] mb-3 line-clamp-2 flex-1">{university.description}</p>
+        )}
+
+        {/* Quick Actions Bar */}
+        <div className="flex items-center gap-2 mb-3 py-2.5 border-y border-gray-100">
+          <SaveButton universityId={university.id} variant="labeled" />
+          <div className="w-px h-5 bg-gray-200" />
+          <CompareButton universityId={university.id} variant="labeled" />
+          <div className="w-px h-5 bg-gray-200" />
+          <TrackButton universityId={university.id} universityName={university.name} variant="labeled" />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mt-auto">
+          <Link href={`/universities/${university.id}`} className="flex-1">
+            <Button variant="outline" size="sm" className="w-full">
+              View Details
+            </Button>
+          </Link>
+          <Button
+            variant="primary"
+            size="sm"
+            className="flex-1"
+            onClick={() => {
+              const message = `Hi, I'm interested in ${university.name} in ${university.country}. Can you tell me more about admission requirements and application process?`;
+              const whatsappUrl = `https://wa.me/918658805653?text=${encodeURIComponent(message)}`;
+              window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+            }}
+          >
+            WhatsApp Us
+          </Button>
+        </div>
+      </div>
     </Card>
   );
 }

@@ -114,7 +114,7 @@ export function truncate(str: string, maxLength: number): string {
 /**
  * Debounce function for search inputs
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => void>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {

@@ -6,6 +6,8 @@
 export const COUNTRIES = [
   { value: "United States", label: "United States", flag: "🇺🇸" },
   { value: "United Kingdom", label: "United Kingdom", flag: "🇬🇧" },
+  { value: "Canada", label: "Canada", flag: "🇨🇦" },
+  { value: "Australia", label: "Australia", flag: "🇦🇺" },
   { value: "Germany", label: "Germany", flag: "🇩🇪" },
   { value: "Ireland", label: "Ireland", flag: "🇮🇪" },
   { value: "Netherlands", label: "Netherlands", flag: "🇳🇱" },
@@ -14,8 +16,10 @@ export const COUNTRIES = [
   { value: "Spain", label: "Spain", flag: "🇪🇸" },
   { value: "United Arab Emirates", label: "UAE", flag: "🇦🇪" },
   { value: "Saudi Arabia", label: "Saudi Arabia", flag: "🇸🇦" },
-  { value: "Australia", label: "Australia", flag: "🇦🇺" },
   { value: "New Zealand", label: "New Zealand", flag: "🇳🇿" },
+  { value: "Singapore", label: "Singapore", flag: "🇸🇬" },
+  { value: "Hong Kong", label: "Hong Kong", flag: "🇭🇰" },
+  { value: "South Korea", label: "South Korea", flag: "🇰🇷" },
 ] as const;
 
 // Field of study options for onboarding dropdown
@@ -63,7 +67,7 @@ export const WHATSAPP_CONFIG = {
 // Landing page stats
 export const LANDING_STATS = {
   universitiesCount: 500,
-  countriesCount: 12,
+  countriesCount: 16,
   studentsHelped: 10000,
   successRate: 98,
 } as const;

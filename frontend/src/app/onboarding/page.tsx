@@ -56,7 +56,7 @@ export default function OnboardingPage() {
         } else if (currentUser?.onboardingStep) {
           setCurrentStep(currentUser.onboardingStep as Step);
         }
-      } catch (error) {
+      } catch {
         // User doesn't exist yet, continue with onboarding
         console.log("Starting fresh onboarding");
       }
@@ -164,7 +164,7 @@ export default function OnboardingPage() {
         budgetMax: validatedData.budgetMax,
         targetField: validatedData.targetField,
         targetIntake: validatedData.targetIntake || undefined,
-        testsTaken: (validatedData.testsTaken || []) as any[],
+        testsTaken: (validatedData.testsTaken || []) as string[],
         greScore: validatedData.gre || undefined,
         gmatScore: validatedData.gmat || undefined,
         ieltsScore: validatedData.ielts || undefined,
@@ -172,9 +172,10 @@ export default function OnboardingPage() {
       });
 
       router.push("/universities");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to complete onboarding:", error);
-      setErrors({ submit: error.message || "Something went wrong" });
+      const message = error instanceof Error ? error.message : "Something went wrong";
+      setErrors({ submit: message });
     } finally {
       setIsSubmitting(false);
     }

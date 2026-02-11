@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ===========================================
@@ -26,19 +27,43 @@ enum TestTaken {
   NONE
 }
 
+enum ApplicationStatus {
+  RESEARCHING
+  PREPARING
+  APPLIED
+  ACCEPTED
+  REJECTED
+}
+
+enum CampusType {
+  URBAN
+  SUBURBAN
+  RURAL
+}
+
+enum DegreeType {
+  BACHELORS
+  MASTERS
+  PHD
+  DIPLOMA
+  CERTIFICATE
+}
+
 // ===========================================
 // Models
 // ===========================================
 
 model User {
-  id             String          @id @default(cuid())
-  email          String          @unique
-  clerkId        String          @unique
-  role           Role            @default(STUDENT)
-  onboardingStep Int             @default(0)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  studentProfile StudentProfile?
+  id                 String            @id @default(cuid())
+  email              String            @unique
+  clerkId            String            @unique
+  role               Role              @default(STUDENT)
+  onboardingStep     Int               @default(0)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  studentProfile     StudentProfile?
+  savedUniversities  SavedUniversity[]
+  applications       Application[]
 
   @@map("users")
 }
@@ -62,20 +87,62 @@ model StudentProfile {
 }
 
 model University {
-  id            String   @id @default(cuid())
-  name          String
-  country       String
-  city          String
-  tuitionFee    Int      // Annual tuition in USD
-  publicPrivate String   // "Public" or "Private"
-  logoUrl       String?  // Optional logo URL
-  description   String?  // Brief description/narrative
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                         String      @id @default(cuid())
+  name                       String
+  country                    String
+  city                       String
+  tuitionFee                 Int         // Annual tuition in USD
+  publicPrivate              String      // "Public" or "Private"
+  logoUrl                    String?     // Optional logo URL
+  imageUrl                   String?     // Campus/banner image
+  websiteUrl                 String?     // University website URL
+  description                String?     // Brief description/narrative
+  address                    String?     // Full address
+
+  // Rankings
+  qsRanking                  Int?        // QS World Ranking
+  timesRanking               Int?        // Times Higher Education Ranking
+  usNewsRanking              Int?        // US News Ranking
+
+  // Admissions
+  acceptanceRate             Float?      // e.g., 0.07 for 7%
+  applicationFee             Int?        // In USD
+
+  // Campus & Student Life
+  campusType                 CampusType? // Urban, Suburban, Rural
+  totalStudents              Int?        // Total enrolled students
+  internationalStudentPercent Float?     // e.g., 0.23 for 23%
+
+  // Financial
+  foodHousingCost            Int?        // Annual food & housing in USD
+  avgScholarshipAmount       Int?        // Average scholarship in USD
+  employmentRate             Float?      // Post-graduation, e.g., 0.94 for 94%
+
+  createdAt                  DateTime    @default(now())
+  updatedAt                  DateTime    @updatedAt
+
+  savedBy                    SavedUniversity[]
+  applications               Application[]
+  programs                   Program[]
 
   @@index([country])
   @@index([tuitionFee])
+  @@index([qsRanking])
   @@map("universities")
+}
+
+// Saved/Shortlisted universities by users
+model SavedUniversity {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  universityId String
+  university   University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([userId, universityId])
+  @@index([userId])
+  @@map("saved_universities")
 }
 
 // Lead tracking for WhatsApp redirects
@@ -95,4 +162,61 @@ model WhatsAppLead {
 
   @@index([clerkId])
   @@map("whatsapp_leads")
+}
+
+// Program / Course within a university
+model Program {
+  id                  String     @id @default(cuid())
+  universityId        String
+  university          University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  name                String     // e.g., "MS Computer Science"
+  degreeType          DegreeType // BACHELORS, MASTERS, PHD, etc.
+  department          String?    // e.g., "School of Engineering"
+  duration            String?    // e.g., "2 years", "4 years"
+  tuitionFee          Int?       // Program-specific tuition in USD (overrides university-level)
+  description         String?    // Program description
+
+  // Application Details
+  applicationDeadline DateTime?  // Next upcoming deadline
+  intakes             String[]   // e.g., ["Fall", "Spring"]
+
+  // Admission Requirements
+  greRequired         Boolean    @default(false)
+  greMinScore         Int?       // Minimum GRE score
+  gmatRequired        Boolean    @default(false)
+  gmatMinScore        Int?       // Minimum GMAT score
+  ieltsMinScore       Float?     // e.g., 6.5
+  toeflMinScore       Int?       // e.g., 90
+  gpaMinScore         Float?     // e.g., 3.0 on 4.0 scale
+
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@index([universityId])
+  @@index([degreeType])
+  @@index([name])
+  @@map("programs")
+}
+
+// Application tracker for university applications
+model Application {
+  id           String            @id @default(cuid())
+  userId       String
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  universityId String
+  university   University        @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  status       ApplicationStatus @default(RESEARCHING)
+  program      String?           // Program name (e.g., "MS Computer Science")
+  intake       String?           // Intake (e.g., "Fall 2026")
+  notes        String?           // Personal notes
+  deadline     DateTime?         // Application deadline
+  appliedAt    DateTime?         // When application was submitted
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@unique([userId, universityId])
+  @@index([userId])
+  @@index([status])
+  @@map("applications")
 }
