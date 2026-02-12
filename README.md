@@ -1,6 +1,6 @@
 # WingsEd - Digital Sherpa V1
 
-> 🎓 Helping Indian students find their dream universities abroad
+Helping Indian students find their dream universities abroad
 
 A minimalist, trust-first web application for Indian students planning to study abroad (postgraduate).
 
@@ -11,7 +11,7 @@ A minimalist, trust-first web application for Indian students planning to study 
 - **Auth**: Clerk (OAuth, OTP, Email)
 - **Backend**: NestJS with Module-Service-Controller architecture
 - **Database**: PostgreSQL with Prisma ORM
-- **Search**: Typesense
+- **Search**: PostgreSQL `pg_trgm` (Fuzzy Search) for now
 
 ## Prerequisites
 
@@ -32,7 +32,6 @@ docker-compose up -d
 
 This starts:
 - PostgreSQL on `localhost:5432`
-- Typesense on `localhost:8108`
 
 Verify services are running:
 ```bash
@@ -52,20 +51,17 @@ npm install
 cp .env.example .env
 
 # Edit .env and add your Clerk keys
-# Then run database migrations
+# Then run database migrations (this enables pg_trgm extension)
 npx prisma migrate dev --name init
 
 # Seed the database with university data
 npx prisma db seed
 
-# Sync universities to Typesense
-npm run typesense:sync
-
 # Start development server
 npm run start:dev
 ```
 
-Backend runs on `http://localhost:4000`
+Backend runs on render
 
 ### Step 3: Setup Frontend
 
@@ -85,7 +81,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Frontend runs on `http://localhost:3000`
+Frontend runs on vercel
 
 # Environment Variables
 
@@ -97,8 +93,8 @@ Frontend runs on `http://localhost:3000`
 | `CLERK_SECRET_KEY` | Clerk secret key (sk_test_...) |
 | `CLERK_PUBLISHABLE_KEY` | Clerk publishable key (pk_test_...) |
 | `CLERK_WEBHOOK_SECRET` | Webhook secret for user sync |
-| `TYPESENSE_API_KEY` | Typesense admin API key |
-| `WHATSAPP_PHONE_NUMBER` | WhatsApp business number |
+| `WHATSAPP_PHONE_NUMBER` | WhatsApp business number (optional) |
+| `CORS_ORIGINS` | Comma-separated list of allowed origins (e.g. `https://wingsed.com,https://www.wingsed.com`) |
 
 ### Frontend (.env.local)
 
@@ -106,14 +102,14 @@ Frontend runs on `http://localhost:3000`
 |----------|-------------|
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key |
 | `CLERK_SECRET_KEY` | Clerk secret key |
-| `NEXT_PUBLIC_API_URL` | Backend API URL |
+| `NEXT_PUBLIC_API_URL` | Backend API URL (Use Render URL in production) |
 | `NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER` | WhatsApp number |
 
 ## Project Structure
 
 ```
 wingsed/
-├── docker-compose.yml     # PostgreSQL + Typesense
+├── docker-compose.yml     # PostgreSQL
 ├── backend/               # NestJS API
 │   ├── src/
 │   │   ├── modules/       # Feature modules
@@ -149,16 +145,6 @@ npx prisma studio
 npx prisma db seed
 ```
 
-##  Typesense Commands
-
-```bash
-# Sync universities from PostgreSQL to Typesense
-npm run typesense:sync
-
-# Clear Typesense index
-npm run typesense:clear
-```
-
 ##  Deployment
 
 ### Frontend (Vercel)
@@ -168,15 +154,16 @@ npm run typesense:clear
 3. Set environment variables
 4. Deploy
 
-### Backend (Railway)
+### Backend (Render / Railway)
 
-1. Create new project in Railway
-2. Add PostgreSQL from Railway's database options
-3. Deploy from GitHub
-4. Set environment variables
-5. Add Typesense Cloud or self-host on Railway
+1. Create new Web Service in Render/Railway
+2. Connect GitHub repository
+3. Context: `backend`
+4. Build Command: `npm install && npx prisma migrate deploy && npm run build`
+5. Start Command: `npm run start:prod`
+6. Add Environment Variables (`DATABASE_URL`, `CLERK_KEYS`, `CORS_ORIGINS`)
 
-## 📝 License
+## License
 
 Private - All rights reserved
 
