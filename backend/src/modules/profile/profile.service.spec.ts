@@ -19,6 +19,7 @@ describe('ProfileService', () => {
     id: 'profile-123',
     userId: 'user-123',
     country: 'USA',
+    customDestination: null,
     budgetMin: 20000,
     budgetMax: 50000,
     targetField: 'Computer Science',
@@ -119,6 +120,7 @@ describe('ProfileService', () => {
         data: {
           userId: 'user-123',
           country: 'USA',
+          customDestination: undefined,
           budgetMin: 20000,
           budgetMax: 50000,
           targetField: 'Computer Science',

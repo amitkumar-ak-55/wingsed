@@ -32,6 +32,7 @@ export const intakeSchema = z.object({
 // Combined onboarding schema
 export const onboardingSchema = z.object({
   preferredCountries: z.array(z.string()).min(1, "Please select at least one country"),
+  customDestination: z.string().max(200).optional(),
   budgetMin: z.number().min(0),
   budgetMax: z.number().min(0),
   targetField: z.string().min(1, "Please select your field of study"),

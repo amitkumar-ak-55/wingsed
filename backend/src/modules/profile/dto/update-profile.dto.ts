@@ -16,6 +16,11 @@ export class UpdateProfileDto {
   country?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  customDestination?: string;
+
+  @IsOptional()
   @IsInt()
   @Min(0)
   @Max(100000000)

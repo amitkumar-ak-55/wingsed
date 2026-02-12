@@ -10,7 +10,7 @@ import { ProfileModule } from './modules/profile/profile.module';
 import { UniversitiesModule } from './modules/universities/universities.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
-import { TypesenseModule } from './modules/typesense/typesense.module';
+
 import { SavedUniversitiesModule } from './modules/saved-universities/saved-universities.module';
 import { ApplicationsModule } from './modules/applications/applications.module';
 import { AdminModule } from './modules/admin/admin.module';
@@ -49,7 +49,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     UniversitiesModule,
     LeadsModule,
     WebhooksModule,
-    TypesenseModule,
+
     SavedUniversitiesModule,
     ApplicationsModule,
     AdminModule,

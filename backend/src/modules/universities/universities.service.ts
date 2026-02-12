@@ -22,7 +22,7 @@ export interface PaginatedResult<T> {
 
 @Injectable()
 export class UniversitiesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   /**
    * Search universities with filters and pagination
@@ -32,38 +32,30 @@ export class UniversitiesService {
     page: number = 1,
     pageSize: number = 12,
   ): Promise<PaginatedResult<University>> {
+    // When search term is present, use pg_trgm fuzzy matching via raw SQL
+    if (filters.search && filters.search.trim().length > 0) {
+      return this.fuzzySearch(filters, page, pageSize);
+    }
+
+    // Non-search queries use Prisma
     const where: Prisma.UniversityWhereInput = {};
 
-    // Country filter
     if (filters.country) {
       where.country = filters.country;
     }
 
-    // Budget range filter (convert INR to USD since tuitionFee is stored in USD)
     if (filters.budgetMin !== undefined || filters.budgetMax !== undefined) {
       where.tuitionFee = {};
       if (filters.budgetMin !== undefined) {
-        // Convert INR to USD
         where.tuitionFee.gte = Math.floor(filters.budgetMin / INR_TO_USD_RATE);
       }
       if (filters.budgetMax !== undefined) {
-        // Convert INR to USD
         where.tuitionFee.lte = Math.ceil(filters.budgetMax / INR_TO_USD_RATE);
       }
     }
 
-    // Text search (name, city)
-    if (filters.search) {
-      where.OR = [
-        { name: { contains: filters.search, mode: 'insensitive' } },
-        { city: { contains: filters.search, mode: 'insensitive' } },
-      ];
-    }
-
-    // Get total count
     const total = await this.prisma.university.count({ where });
 
-    // Get paginated results
     const data = await this.prisma.university.findMany({
       where,
       orderBy: { name: 'asc' },
@@ -71,6 +63,85 @@ export class UniversitiesService {
       take: pageSize,
       include: { programs: true },
     });
+
+    return {
+      data,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
+  /**
+   * Fuzzy search using pg_trgm for typo tolerance
+   * Searches name, city, and description with similarity scoring
+   */
+  private async fuzzySearch(
+    filters: UniversityFilters,
+    page: number,
+    pageSize: number,
+  ): Promise<PaginatedResult<University>> {
+    const searchTerm = filters.search!.trim();
+    const offset = (page - 1) * pageSize;
+
+    // Build dynamic WHERE conditions
+    const conditions: string[] = [
+      `(
+        name % $1
+        OR city % $1
+        OR name ILIKE '%' || $1 || '%'
+        OR city ILIKE '%' || $1 || '%'
+        OR description ILIKE '%' || $1 || '%'
+      )`,
+    ];
+    const params: (string | number)[] = [searchTerm];
+    let paramIndex = 2;
+
+    if (filters.country) {
+      conditions.push(`country = $${paramIndex}`);
+      params.push(filters.country);
+      paramIndex++;
+    }
+
+    if (filters.budgetMin !== undefined) {
+      const minUSD = Math.floor(filters.budgetMin / INR_TO_USD_RATE);
+      conditions.push(`"tuitionFee" >= $${paramIndex}`);
+      params.push(minUSD);
+      paramIndex++;
+    }
+
+    if (filters.budgetMax !== undefined) {
+      const maxUSD = Math.ceil(filters.budgetMax / INR_TO_USD_RATE);
+      conditions.push(`"tuitionFee" <= $${paramIndex}`);
+      params.push(maxUSD);
+      paramIndex++;
+    }
+
+    const whereClause = conditions.join(' AND ');
+
+    // Count query
+    const countResult = await this.prisma.$queryRawUnsafe<[{ count: bigint }]>(
+      `SELECT COUNT(*) as count FROM universities WHERE ${whereClause}`,
+      ...params,
+    );
+    const total = Number(countResult[0].count);
+
+    // Data query with similarity scoring for relevance ranking
+    const data = await this.prisma.$queryRawUnsafe<University[]>(
+      `SELECT *,
+        GREATEST(
+          similarity(name, $1),
+          similarity(city, $1)
+        ) as search_score
+      FROM universities
+      WHERE ${whereClause}
+      ORDER BY search_score DESC, name ASC
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+      ...params,
+      pageSize,
+      offset,
+    );
 
     return {
       data,

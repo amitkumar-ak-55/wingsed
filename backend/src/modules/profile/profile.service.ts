@@ -6,7 +6,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class ProfileService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   /**
    * Get profile by user's Clerk ID
@@ -43,6 +43,7 @@ export class ProfileService {
       data: {
         userId: user.id,
         country: dto.country,
+        customDestination: dto.customDestination,
         budgetMin: dto.budgetMin,
         budgetMax: dto.budgetMax,
         targetField: dto.targetField,

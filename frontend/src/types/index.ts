@@ -19,6 +19,7 @@ export interface StudentProfile {
   id: string;
   userId: string;
   preferredCountries: string[];
+  customDestination: string | null;
   budgetMin: number | null;
   budgetMax: number | null;
   targetField: string;

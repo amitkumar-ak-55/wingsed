@@ -17,6 +17,7 @@ describe('ProfileController', () => {
     id: 'profile-123',
     userId: 'user-123',
     country: 'USA',
+    customDestination: null,
     budgetMin: 20000,
     budgetMax: 50000,
     targetField: 'Computer Science',

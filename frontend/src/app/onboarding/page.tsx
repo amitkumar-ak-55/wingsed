@@ -23,6 +23,7 @@ export default function OnboardingPage() {
   // Form data
   const [formData, setFormData] = useState<Partial<OnboardingFormData>>({
     preferredCountries: [],
+    customDestination: "",
     budgetMin: undefined,
     budgetMax: undefined,
     targetField: "",
@@ -45,7 +46,7 @@ export default function OnboardingPage() {
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       if (!isSignedIn) return;
-      
+
       try {
         const token = await getToken();
         if (!token) return;
@@ -160,6 +161,7 @@ export default function OnboardingPage() {
       // Create profile
       await api.createProfile(token, {
         preferredCountries: validatedData.preferredCountries,
+        customDestination: validatedData.customDestination || undefined,
         budgetMin: validatedData.budgetMin,
         budgetMax: validatedData.budgetMax,
         targetField: validatedData.targetField,
@@ -234,11 +236,10 @@ export default function OnboardingPage() {
                       key={country.value}
                       type="button"
                       onClick={() => toggleCountry(country.value)}
-                      className={`p-4 rounded-xl border-2 transition-all ${
-                        isSelected
+                      className={`p-4 rounded-xl border-2 transition-all ${isSelected
                           ? "border-[#2563EB] bg-[#2563EB]/5"
                           : "border-[#E5E7EB] hover:border-[#2563EB]/50"
-                      }`}
+                        }`}
                     >
                       <span className="text-2xl block mb-1">{country.flag}</span>
                       <span className="text-sm font-medium text-[#374151]">
@@ -252,6 +253,22 @@ export default function OnboardingPage() {
               {errors.preferredCountries && (
                 <p className="text-red-500 text-sm">{errors.preferredCountries}</p>
               )}
+
+              {/* Free-text destination input */}
+              <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
+                <label className="block text-sm font-medium text-[#374151] mb-2">
+                  Don&apos;t see your country? Type it here
+                </label>
+                <Input
+                  placeholder="e.g. Japan, Switzerland, New Zealand..."
+                  value={formData.customDestination || ""}
+                  onChange={(e) => updateField("customDestination", e.target.value)}
+                  className="max-w-md"
+                />
+                <p className="text-xs text-[#9CA3AF] mt-1">
+                  Optional — for destinations not listed above
+                </p>
+              </div>
             </div>
           )}
 
@@ -285,11 +302,10 @@ export default function OnboardingPage() {
                           updateField("budgetMin", range.min);
                           updateField("budgetMax", range.max);
                         }}
-                        className={`p-4 rounded-xl border-2 text-left transition-all ${
-                          isSelected
+                        className={`p-4 rounded-xl border-2 text-left transition-all ${isSelected
                             ? "border-[#2563EB] bg-[#2563EB]/5"
                             : "border-[#E5E7EB] hover:border-[#2563EB]/50"
-                        }`}
+                          }`}
                       >
                         <span className="font-medium text-[#111827]">
                           {range.label}
@@ -365,11 +381,10 @@ export default function OnboardingPage() {
                       key={test.value}
                       type="button"
                       onClick={() => toggleTest(test.value)}
-                      className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all ${
-                        isSelected
+                      className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all ${isSelected
                           ? "border-[#2563EB] bg-[#2563EB] text-white"
                           : "border-[#E5E7EB] text-[#374151] hover:border-[#2563EB]/50"
-                      }`}
+                        }`}
                     >
                       {test.label}
                     </button>

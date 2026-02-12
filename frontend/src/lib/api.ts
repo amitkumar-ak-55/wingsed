@@ -138,7 +138,7 @@ export async function getRecommendations(params?: {
   if (params?.budgetMin) searchParams.set("budgetMin", params.budgetMin.toString());
   if (params?.budgetMax) searchParams.set("budgetMax", params.budgetMax.toString());
   if (params?.limit) searchParams.set("limit", params.limit.toString());
-  
+
   const query = searchParams.toString();
   return apiClient<{ recommendations: University[] }>(
     `/universities/recommendations${query ? `?${query}` : ""}`,
@@ -328,12 +328,12 @@ export const api = {
     const result = await getCurrentUser(token);
     return result.data;
   },
-  
+
   updateOnboardingStep: async (token: string, step: number) => {
     const result = await updateOnboardingStep(token, step);
     return result.data;
   },
-  
+
   getProfile: async (token: string) => {
     const result = await getProfile(token);
     return result.data;
@@ -341,6 +341,7 @@ export const api = {
 
   createProfile: async (token: string, data: {
     preferredCountries: string[];
+    customDestination?: string;
     budgetMin: number;
     budgetMax: number;
     targetField: string;
@@ -357,7 +358,7 @@ export const api = {
       token,
     });
   },
-  
+
   updateProfile: async (token: string, data: {
     country?: string;
     budgetMin?: number;
@@ -369,7 +370,7 @@ export const api = {
     const result = await updateProfile(token, data);
     return result.data;
   },
-  
+
   createWhatsAppLead: async (token: string, data: {
     name?: string;
     country?: string;
@@ -380,7 +381,7 @@ export const api = {
     const result = await createWhatsAppLead(token, data);
     return result.data;
   },
-  
+
   updateWhatsAppFeedback: async (token: string, leadId: string, feedback: "connected" | "no_response") => {
     const result = await updateWhatsAppFeedback(token, leadId, feedback);
     return result.data;
@@ -435,7 +436,7 @@ export const api = {
     });
 
     // Map 'data' to 'universities' for frontend compatibility
-    return result.data 
+    return result.data
       ? { universities: result.data.data, total: result.data.total, page: result.data.page, totalPages: result.data.totalPages }
       : { universities: [], total: 0, page: 1, totalPages: 1 };
   },

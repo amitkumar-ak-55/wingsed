@@ -18,8 +18,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "db:seed": "ts-node prisma/seed.ts",
-    "typesense:sync": "ts-node src/scripts/typesense-sync.ts",
-    "typesense:clear": "ts-node src/scripts/typesense-clear.ts"
+    "db:reset": "prisma migrate reset"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -42,8 +41,7 @@
     "helmet": "^8.1.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "svix": "^1.84.1",
-    "typesense": "^2.1.0"
+    "svix": "^1.84.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.16",
