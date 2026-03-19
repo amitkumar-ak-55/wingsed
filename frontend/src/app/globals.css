@@ -1,30 +1,50 @@
 @import "tailwindcss";
 
 /* ===========================================
-   WingsEdu Design Tokens
+   WingsEd Brand Design Tokens — Modern Navy
    =========================================== */
 
 :root {
-  /* Colors - Minimalist Design */
-  --background: #F9FAFB;
-  --foreground: #111827;
-  --color-primary: #2563EB;
-  --color-primary-hover: #1D4ED8;
-  --color-secondary: #6B7280;
-  --color-success: #10B981;
+  /* Brand Colors — Palette 2: Modern Navy */
+  --color-primary: #0F172A;
+  --color-primary-light: #1E293B;
+  --color-primary-hover: #334155;
+
+  --color-accent-gold: #F59E0B;
+  --color-accent-gold-light: #FCD34D;
+  --color-accent-gold-hover: #D97706;
+
+  --color-accent-blue: #3B82F6;
+  --color-accent-blue-light: #93C5FD;
+  --color-accent-blue-hover: #2563EB;
+
+  /* Surfaces */
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+
+  /* Text */
+  --foreground: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  /* Borders */
+  --border: #E2E8F0;
+  --border-hover: #CBD5E1;
+
+  /* Feedback */
+  --color-success: #22C55E;
   --color-whatsapp: #25D366;
-  --color-border: #E5E7EB;
-  --color-muted: #9CA3AF;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-jakarta);
 }
 
-/* No dark mode - keep it minimalist light */
+/* No dark mode — minimalist light */
 
 html {
   scroll-behavior: smooth;
@@ -33,14 +53,49 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* ===========================================
-   Animations
+   Typography Utilities
    =========================================== */
+
+.font-display {
+  font-family: var(--font-jakarta), var(--font-inter), sans-serif;
+}
+
+/* Gradient text effect — brand gold to blue */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-accent-gold) 0%, var(--color-accent-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient text — navy to blue */
+.text-gradient-navy {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===========================================
+   Animations — Scroll Reveal
+   =========================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 @keyframes fadeIn {
   from {
@@ -53,10 +108,32 @@ body {
   }
 }
 
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -76,27 +153,30 @@ body {
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
 }
 
 /* Animation Utilities */
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
+.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+.animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+.animate-fade-in-scale { animation: fadeInScale 0.5s ease-out forwards; }
+.animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
+.animate-pulse-subtle { animation: pulse-subtle 2s infinite; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-glow { animation: glow 3s ease-in-out infinite; }
 
-.animate-slide-up {
-  animation: slideUp 0.6s ease-out forwards;
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s infinite;
-}
-
+/* Stagger delays */
 .animate-delay-100 { animation-delay: 100ms; }
 .animate-delay-200 { animation-delay: 200ms; }
 .animate-delay-300 { animation-delay: 300ms; }
@@ -104,45 +184,90 @@ body {
 .animate-delay-500 { animation-delay: 500ms; }
 
 /* Slide up from bottom (for sticky bars) */
-.animate-slideUp {
-  animation: slideUp 0.3s ease-out forwards;
-}
+.animate-slideUp { animation: slideUp 0.3s ease-out forwards; }
 
 /* ===========================================
    Infinite Scroll Animation (Logo Slider)
    =========================================== */
 
 @keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-.animate-scroll {
-  animation: scroll 30s linear infinite;
-}
-
-.animate-scroll-fast {
-  animation: scroll 20s linear infinite;
-}
+.animate-scroll { animation: scroll 30s linear infinite; }
+.animate-scroll-fast { animation: scroll 20s linear infinite; }
 
 .animate-scroll:hover,
 .animate-scroll-fast:hover {
   animation-play-state: paused;
 }
 
-/* Pause animation utility */
 .pause-animation {
   animation-play-state: paused !important;
 }
 
-/* Line clamp utility */
+/* ===========================================
+   Glassmorphism & Surface Effects
+   =========================================== */
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Soft card elevation */
+.card-elevated {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card-elevated:hover {
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.06),
+    0 12px 32px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ===========================================
+   Dot Grid Pattern (for CTA backgrounds)
+   =========================================== */
+
+.dot-pattern {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.15) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+
+/* ===========================================
+   Line Clamp & Misc
+   =========================================== */
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -152,12 +277,7 @@ body {
    =========================================== */
 
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #E5E7EB 0%,
-    #F3F4F6 50%,
-    #E5E7EB 100%
-  );
+  background: linear-gradient(90deg, #E2E8F0 0%, #F1F5F9 50%, #E2E8F0 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 0.375rem;
@@ -168,7 +288,7 @@ body {
    =========================================== */
 
 *:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-accent-blue);
   outline-offset: 2px;
 }
 
@@ -186,11 +306,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+  background: #94A3B8;
 }
-

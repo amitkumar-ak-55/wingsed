@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -9,8 +9,14 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+});
+
 export const metadata: Metadata = {
-  title: "WingsEdu - Shortlist Universities That Fit You",
+  title: "wingsed - Shortlist Universities That Fit You",
   description:
     "Find the perfect university for your postgraduate studies abroad. Get personalized guidance from expert counselors.",
   keywords: [
@@ -22,9 +28,9 @@ export const metadata: Metadata = {
     "education consultant",
     "Indian students",
   ],
-  authors: [{ name: "WingsEdu" }],
+  authors: [{ name: "WingsEd" }],
   openGraph: {
-    title: "WingsEdu - Shortlist Universities That Fit You",
+    title: "wingsed - Shortlist Universities That Fit You",
     description:
       "Find the perfect university for your postgraduate studies abroad.",
     type: "website",
@@ -41,7 +47,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body
-          className={`${inter.variable} font-sans min-h-screen bg-[#F9FAFB] text-[#111827] antialiased`}
+          className={`${inter.variable} ${jakarta.variable} font-sans min-h-screen bg-[#F8FAFC] text-[#0F172A] antialiased`}
           suppressHydrationWarning
         >
           <Providers>
