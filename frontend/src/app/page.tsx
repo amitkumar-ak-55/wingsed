@@ -4,19 +4,21 @@ import {
   CountryStrip,
   HowItWorksSection,
   TestimonialsSection,
+  AdvisorChatSection,
   CTASection,
 } from "@/components/sections";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
       <Header />
       
       <main className="flex-1">
         <HeroSection />
-        <CountryStrip />
         <HowItWorksSection />
+        <CountryStrip />
         <TestimonialsSection />
+        <AdvisorChatSection />
         <CTASection />
       </main>
 

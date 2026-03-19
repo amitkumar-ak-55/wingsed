@@ -3,3 +3,4 @@ export { CountryStrip } from "./country-strip";
 export { HowItWorksSection } from "./how-it-works-section";
 export { TestimonialsSection } from "./testimonials-section";
 export { CTASection } from "./cta-section";
+export { AdvisorChatSection } from "./advisor-chat-section";

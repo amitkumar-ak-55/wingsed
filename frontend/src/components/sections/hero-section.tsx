@@ -1,100 +1,229 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
 import { LANDING_STATS } from "@/data/constants";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
+/* ── Animated counter (reused from original) ── */
+function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          const duration = 2000;
+          const steps = 60;
+          const increment = target / steps;
+          let current = 0;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              setCount(target);
+              clearInterval(timer);
+            } else {
+              setCount(Math.floor(current));
+            }
+          }, duration / steps);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [target]);
+
+  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+}
+
+/* ── Decision‑Engine Widget ── */
+function DecisionEngineWidget() {
+  const [gpa, setGpa] = useState(3.8);
+  const [country, setCountry] = useState("USA");
+  const [budget, setBudget] = useState(60);
+
+  // Simulated chance calc based on GPA
+  const chance = Math.min(99, Math.round(gpa * 22 + (country === "Germany" ? 2 : 0)));
+  const budgetLabel = `₹${Math.max(10, budget - 20)}L – ₹${budget}L`;
+
+  const previewUnis = [
+    { name: "MIT", tag: "Safe", color: "text-green-600" },
+    { name: "TU Munich", tag: "Target", color: "text-amber-600" },
+    { name: "Imperial", tag: "Reach", color: "text-blue-600" },
+  ];
+
+  return (
+    <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-[#E2E8F0] shadow-2xl shadow-[#0F172A]/10">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-[#0F172A] font-bold text-lg">Your Personalized Shortlist</h3>
+        <span className="text-[11px] bg-[#0F172A] text-white px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+          Live Engine
+        </span>
+      </div>
+
+      {/* Inputs */}
+      <div className="space-y-5">
+        <div className="grid grid-cols-2 gap-4">
+          {/* GPA */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+              GPA (Scale 4.0)
+            </label>
+            <input
+              type="number"
+              step={0.1}
+              min={0}
+              max={4}
+              value={gpa}
+              onChange={(e) => setGpa(parseFloat(e.target.value) || 0)}
+              className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg px-3 py-2.5 text-[#0F172A] font-bold text-sm focus:border-[#F59E0B] focus:ring-1 focus:ring-[#F59E0B] outline-none transition-colors"
+            />
+          </div>
+          {/* Country */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+              Country
+            </label>
+            <select
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="w-full bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg px-3 py-2.5 text-[#0F172A] font-bold text-sm focus:border-[#F59E0B] focus:ring-1 focus:ring-[#F59E0B] outline-none transition-colors"
+            >
+              <option>USA</option>
+              <option>Germany</option>
+              <option>UK</option>
+              <option>Canada</option>
+              <option>Australia</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Budget slider */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between items-center">
+            <label className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+              Budget Range
+            </label>
+            <span className="text-sm font-bold text-[#F59E0B]">{budgetLabel}</span>
+          </div>
+          <input
+            type="range"
+            min={20}
+            max={100}
+            value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
+            className="w-full h-1.5 bg-[#E2E8F0] rounded-full appearance-none accent-[#F59E0B] cursor-pointer"
+          />
+        </div>
+
+        {/* Chances */}
+        <div className="pt-5 border-t border-[#E2E8F0]">
+          <div className="flex justify-between items-end mb-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Profile Strength</p>
+              <p className="text-lg font-bold text-[#0F172A]">{chance >= 80 ? "Strong" : chance >= 60 ? "Moderate" : "Building"}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Your Chances</p>
+              <p className="text-lg font-bold text-[#F59E0B]">{chance}%</p>
+            </div>
+          </div>
+          <div className="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${chance}%` }}
+            />
+          </div>
+
+          {/* Preview colleges */}
+          <div className="mt-5 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Architect&apos;s Selection</p>
+            <div className="grid grid-cols-3 gap-2">
+              {previewUnis.map((u) => (
+                <div key={u.name} className="bg-[#F8FAFC] p-3 rounded-lg border border-[#E2E8F0] text-center">
+                  <div className="text-xs font-bold text-[#0F172A] mb-1">{u.name}</div>
+                  <div className={`text-[11px] font-bold uppercase ${u.color}`}>{u.tag}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <Link
+          href="/onboarding"
+          className="block w-full text-center bg-[#F59E0B] hover:bg-[#D97706] text-white py-4 rounded-xl font-bold uppercase tracking-wider text-sm shadow-lg shadow-[#F59E0B]/25 transition-all duration-300 active:scale-[0.98]"
+        >
+          See Your Personalized Plan
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main Hero Section ── */
 export function HeroSection() {
   return (
-    <section className="relative bg-[#FAFAFA] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          {/* Left Content */}
-          <div className="animate-fadeIn">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#111827] rounded-full text-sm font-semibold mb-8">
-              <span className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse" />
-              {LANDING_STATS.studentsHelped}+ students placed
-            </div>
+    <section className="relative overflow-hidden bg-[#0F172A]">
+      {/* Subtle decorative elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-1/2 h-full border-l border-white/5" />
+        <div className="absolute top-1/4 left-0 w-full h-px border-t border-white/5" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[#3B82F6]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-20 w-96 h-96 bg-[#F59E0B]/10 rounded-full blur-3xl" />
+      </div>
 
-            {/* Heading */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#111827] leading-[1.1] mb-6">
-              Navigate your
-              <br />
-              <span className="relative inline-block">
-                study abroad
-                <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 200 12" fill="none">
-                  <path d="M2 8.5C50 2.5 150 2.5 198 8.5" stroke="#2563EB" strokeWidth="4" strokeLinecap="round"/>
-                </svg>
-              </span>
-              <br />
-              journey
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 lg:pt-36 lg:pb-24 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* ── Left: Copy ── */}
+          <ScrollReveal direction="up">
+            <span className="inline-block text-[#F59E0B] font-bold tracking-[0.2em] uppercase text-xs mb-6">
+              The Decision-First Architect
+            </span>
+
+            <h1 className="text-white text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 font-display">
+              Shortlist Universities That{" "}
+              <span className="text-[#F59E0B]">Actually Fit You.</span>
             </h1>
 
-            {/* Description */}
-            <p className="text-lg text-[#6B7280] mb-8 max-w-md">
-              Our platform helps Indian postgrad students discover their perfect 
-              university through personalized recommendations, budget filters, 
-              and expert WhatsApp counseling.
+            <p className="text-[#94A3B8] text-base sm:text-lg max-w-lg mb-10 leading-relaxed">
+              Stop guessing. Use architectural precision and historical data to
+              engineer your global education journey.
             </p>
 
-            {/* CTA */}
-            <Link
-              href="/onboarding"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#111827] text-white font-semibold rounded-full hover:bg-[#374151] transition-all duration-200 group"
-            >
-              Book a consultation
-              <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </div>
-
-          {/* Right Visual */}
-          <div className="relative animate-slideUp">
-            {/* Main illustration container */}
-            <div className="relative bg-white border-2 border-[#111827] rounded-3xl p-8 shadow-[8px_8px_0px_0px_#111827]">
-              {/* Decorative elements */}
-              <div className="absolute -top-4 -right-4 w-12 h-12 bg-[#2563EB] rounded-xl flex items-center justify-center rotate-12">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-              
-              <div className="absolute -bottom-3 -left-3 w-10 h-10 bg-[#22C55E] rounded-lg flex items-center justify-center -rotate-6">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-
-              {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-2xl p-6 text-center">
-                  <div className="text-4xl font-bold text-[#111827] mb-1">{LANDING_STATS.universitiesCount}+</div>
-                  <div className="text-sm text-[#6B7280]">Universities</div>
-                </div>
-                <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-2xl p-6 text-center">
-                  <div className="text-4xl font-bold text-[#111827] mb-1">{LANDING_STATS.countriesCount}</div>
-                  <div className="text-sm text-[#6B7280]">Countries</div>
-                </div>
-                <div className="bg-[#2563EB] rounded-2xl p-6 text-center">
-                  <div className="text-4xl font-bold text-white mb-1">{LANDING_STATS.successRate}%</div>
-                  <div className="text-sm text-blue-100">Success Rate</div>
-                </div>
-                <div className="bg-[#111827] rounded-2xl p-6 text-center">
-                  <div className="text-4xl font-bold text-white mb-1">24/7</div>
-                  <div className="text-sm text-gray-300">Support</div>
+            {/* Social proof avatars */}
+            <div className="flex items-center gap-4">
+              <div className="flex -space-x-3">
+                {["#3B82F6", "#F59E0B", "#22C55E"].map((bg, i) => (
+                  <div
+                    key={i}
+                    className="w-11 h-11 rounded-full border-2 border-[#0F172A] flex items-center justify-center text-xs font-bold text-white"
+                    style={{ background: bg }}
+                  >
+                    {["A", "R", "P"][i]}
+                  </div>
+                ))}
+                <div className="w-11 h-11 rounded-full border-2 border-[#0F172A] bg-[#F59E0B] flex items-center justify-center text-xs font-bold text-[#0F172A]">
+                  98%
                 </div>
               </div>
-
-              {/* Floating icons */}
-              <div className="absolute top-1/2 -left-6 w-12 h-12 bg-white border-2 border-[#E5E7EB] rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-2xl">🎓</span>
-              </div>
-              <div className="absolute top-4 left-1/2 w-10 h-10 bg-white border-2 border-[#E5E7EB] rounded-full flex items-center justify-center shadow-lg">
-                <span className="text-xl">✈️</span>
-              </div>
+              <span className="text-white text-sm font-medium">
+                Join <span className="font-bold">{LANDING_STATS.studentsHelped.toLocaleString()}+</span> successful alumni
+              </span>
             </div>
-          </div>
+          </ScrollReveal>
+
+          {/* ── Right: Decision Engine Widget ── */}
+          <ScrollReveal direction="up" delay={200}>
+            <DecisionEngineWidget />
+          </ScrollReveal>
         </div>
       </div>
     </section>

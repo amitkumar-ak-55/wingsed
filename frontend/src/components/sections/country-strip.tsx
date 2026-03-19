@@ -1,122 +1,168 @@
 "use client";
 
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { LANDING_STATS } from "@/data/constants";
 
-// Universities with Wikipedia/Wikimedia Commons logo URLs
-const UNIVERSITIES = [
-  { name: "University of Melbourne", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/University_of_Melbourne_Logo.svg", country: "🇦🇺 Australia" },
-  { name: "University of Oxford", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2a/University_of_Oxford_coat_of_arms.svg", country: "🇬🇧 UK" },
-  { name: "ETH Zürich", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2a/ETH_Z%C3%BCrich_Logo_black.svg", country: "🇨🇭 Switzerland" },
-  { name: "Harvard University", logo: "https://upload.wikimedia.org/wikipedia/en/2/29/Harvard_shield_wreath.svg", country: "🇺🇸 USA" },
-  { name: "University of Auckland", logo: "https://upload.wikimedia.org/wikipedia/en/5/59/University_of_Auckland_logo.svg", country: "🇳🇿 New Zealand" },
-  { name: "TU Munich", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Logo_of_the_Technical_University_of_Munich.svg", country: "🇩🇪 Germany" },
-  { name: "NYU Abu Dhabi", logo: "https://upload.wikimedia.org/wikipedia/commons/1/16/New_York_University_Seal.svg", country: "🇦🇪 UAE" },
-  { name: "University of Toronto", logo: "https://upload.wikimedia.org/wikipedia/commons/7/79/University_of_Toronto_coat_of_arms.svg", country: "🇨🇦 Canada" },
-  { name: "University of Sydney", logo: "https://upload.wikimedia.org/wikipedia/en/4/4e/University_of_Sydney_seal.svg", country: "🇦🇺 Australia" },
-  { name: "University of Cambridge", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Coat_of_Arms_of_the_University_of_Cambridge.svg", country: "🇬🇧 UK" },
-  { name: "KAUST", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/King_Abdullah_University_of_Science_and_Technology_Logo.svg", country: "🇸🇦 Saudi Arabia" },
-  { name: "MIT", logo: "https://upload.wikimedia.org/wikipedia/commons/0/0c/MIT_logo.svg", country: "🇺🇸 USA" },
-  { name: "University of Otago", logo: "https://upload.wikimedia.org/wikipedia/en/a/a6/University_of_Otago_Logo.svg", country: "🇳🇿 New Zealand" },
-  { name: "Sorbonne University", logo: "https://upload.wikimedia.org/wikipedia/commons/3/31/Logo_Sorbonne_Universit%C3%A9.svg", country: "🇫🇷 France" },
-  { name: "NUS Singapore", logo: "https://upload.wikimedia.org/wikipedia/en/b/b9/NUS_coat_of_arms.svg", country: "🇸🇬 Singapore" },
-  { name: "Khalifa University", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/Khalifa_University_Logo.svg", country: "🇦🇪 UAE" },
-  { name: "ANU", logo: "https://upload.wikimedia.org/wikipedia/commons/1/19/Australian_National_University_crest.svg", country: "🇦🇺 Australia" },
-  { name: "Trinity College Dublin", logo: "https://upload.wikimedia.org/wikipedia/commons/8/84/Trinity_College_Dublin_Crest.svg", country: "🇮🇪 Ireland" },
-  { name: "Stanford University", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b7/Stanford_University_seal_2003.svg", country: "🇺🇸 USA" },
-  { name: "McGill University", logo: "https://upload.wikimedia.org/wikipedia/commons/8/83/McGill_University_CoA.svg", country: "🇨🇦 Canada" },
-  { name: "University of Queensland", logo: "https://upload.wikimedia.org/wikipedia/en/2/2b/University_of_Queensland_logo.svg", country: "🇦🇺 Australia" },
-  { name: "TU Delft", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/TU_Delft_Logo.svg", country: "🇳🇱 Netherlands" },
-  { name: "Qatar University", logo: "https://upload.wikimedia.org/wikipedia/en/2/2a/Qatar_University_Logo.svg", country: "🇶🇦 Qatar" },
-  { name: "Imperial College London", logo: "https://upload.wikimedia.org/wikipedia/commons/5/53/Imperial_College_London_logo.svg", country: "🇬🇧 UK" },
-  { name: "Victoria University of Wellington", logo: "https://upload.wikimedia.org/wikipedia/en/d/d5/Victoria_University_of_Wellington_logo.svg", country: "🇳🇿 New Zealand" },
-  { name: "LMU Munich", logo: "https://upload.wikimedia.org/wikipedia/commons/0/06/LMU_Muenchen_Logo.svg", country: "🇩🇪 Germany" },
-  { name: "Tel Aviv University", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Tel_Aviv_University_logo.svg", country: "🇮🇱 Israel" },
-  { name: "UNSW Sydney", logo: "https://upload.wikimedia.org/wikipedia/en/b/bd/University_of_New_South_Wales_logo.svg", country: "🇦🇺 Australia" },
-  { name: "Yale University", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Yale_University_logo.svg", country: "🇺🇸 USA" },
-  { name: "University of Amsterdam", logo: "https://upload.wikimedia.org/wikipedia/commons/e/e3/UvA_Logo.svg", country: "🇳🇱 Netherlands" },
-  { name: "Monash University", logo: "https://upload.wikimedia.org/wikipedia/en/c/c2/Monash_University_logo.svg", country: "🇦🇺 Australia" },
-  { name: "KU Leuven", logo: "https://upload.wikimedia.org/wikipedia/commons/9/95/KU_Leuven_logo.svg", country: "🇧🇪 Belgium" },
-  { name: "UBC Vancouver", logo: "https://upload.wikimedia.org/wikipedia/commons/7/75/University_of_British_Columbia_Coat_of_Arms.svg", country: "🇨🇦 Canada" },
-  { name: "University of Edinburgh", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4f/University_of_Edinburgh_coat_of_arms.svg", country: "🇬🇧 UK" },
-  { name: "HKU", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/HKU_logo.svg", country: "🇭🇰 Hong Kong" },
-  { name: "Heidelberg University", logo: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Ruprecht-Karls-Universit%C3%A4t_Heidelberg_Logo.svg", country: "🇩🇪 Germany" },
-  { name: "University of Canterbury", logo: "https://upload.wikimedia.org/wikipedia/en/9/94/University_of_Canterbury_logo.svg", country: "🇳🇿 New Zealand" },
-  { name: "LSE London", logo: "https://upload.wikimedia.org/wikipedia/commons/5/51/LSE_Logo.svg", country: "🇬🇧 UK" },
-  { name: "NTU Singapore", logo: "https://upload.wikimedia.org/wikipedia/en/c/c6/Nanyang_Technological_University_coat_of_arms.svg", country: "🇸🇬 Singapore" },
+/* ── Animated counter ── */
+function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          const dur = 2000, steps = 60, inc = target / steps;
+          let cur = 0;
+          const t = setInterval(() => {
+            cur += inc;
+            if (cur >= target) { setCount(target); clearInterval(t); }
+            else setCount(Math.floor(cur));
+          }, dur / steps);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [target]);
+
+  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+}
+
+/* ── Stats data ── */
+const trustStats = [
+  { value: LANDING_STATS.studentsHelped, suffix: "+", label: "Students Placed" },
+  { value: LANDING_STATS.universitiesCount, suffix: "+", label: "Partner Universities" },
+  { value: LANDING_STATS.successRate, suffix: "%", label: "Visa Success Rate" },
+  { value: 120, suffix: "Cr+", label: "Scholarships Secured", prefix: "₹" },
 ];
 
+/* ── University shortlist preview data ── */
+const previewUniversities = [
+  {
+    abbr: "MIT",
+    name: "Massachusetts Institute of Technology",
+    location: "Cambridge, USA",
+    rank: "#1",
+    fitScore: "92%",
+    tuition: "₹45L/Yr",
+    admitProb: "85%",
+    admitColor: "text-green-600",
+  },
+  {
+    abbr: "TUM",
+    name: "Technical University of Munich",
+    location: "Munich, Germany",
+    rank: "#50",
+    fitScore: "95%",
+    tuition: "₹0 – ₹2L/Yr",
+    admitProb: "65%",
+    admitColor: "text-amber-600",
+  },
+  {
+    abbr: "ICL",
+    name: "Imperial College London",
+    location: "London, UK",
+    rank: "#6",
+    fitScore: "88%",
+    tuition: "₹38L/Yr",
+    admitProb: "72%",
+    admitColor: "text-amber-600",
+  },
+];
 
 export function CountryStrip() {
-  // Double the array for seamless infinite scroll
-  const duplicatedUniversities = [...UNIVERSITIES, ...UNIVERSITIES];
-
   return (
-    <section className="bg-white py-10 border-y-2 border-[#111827] overflow-hidden">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-3 h-3 bg-[#22C55E] rounded-full animate-pulse" />
-          <span className="text-base font-bold text-[#111827] uppercase tracking-wider">
-            Partner Universities Worldwide
-          </span>
-          <div className="w-3 h-3 bg-[#22C55E] rounded-full animate-pulse" />
-        </div>
-      </div>
-
-      {/* Infinite Scroll Container */}
-      <div className="relative">
-        {/* Gradient Overlays */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-
-        {/* Scrolling Track - FASTER animation */}
-        <div className="flex animate-scroll-fast hover:[animation-play-state:paused]">
-          {duplicatedUniversities.map((uni, index) => (
-            <div
-              key={`${uni.name}-${index}`}
-              className="flex-shrink-0 mx-4 group cursor-pointer"
-            >
-              <div className="flex flex-col items-center gap-3 p-4 rounded-2xl transition-all duration-300 hover:bg-gray-50 hover:shadow-xl hover:scale-105">
-                {/* University Logo - BIGGER */}
-                <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-gray-100 p-3 transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
-                  <Image
-                    src={uni.logo}
-                    alt={uni.name}
-                    width={80}
-                    height={80}
-                    className="object-contain w-full h-full"
-                    unoptimized
-                  />
-                </div>
-                {/* University Name & Country */}
-                <div className="text-center max-w-[130px]">
-                  <p className="text-sm font-bold text-[#111827] leading-tight line-clamp-2">
-                    {uni.name}
+    <>
+      {/* ──── Trust Bar ──── */}
+      <section className="bg-white py-12 border-b border-[#E2E8F0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {trustStats.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <p className="text-3xl sm:text-4xl font-black text-[#0F172A] font-display">
+                    {stat.prefix || ""}
+                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                   </p>
-                  <p className="text-xs text-[#6B7280] mt-1">{uni.country}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B] mt-1.5">
+                    {stat.label}
+                  </p>
                 </div>
+              ))}
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ──── Shortlist Preview Carousel ──── */}
+      <section className="py-20 lg:py-24 bg-[#F8FAFC]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <ScrollReveal>
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
+              <div>
+                <span className="text-[#F59E0B] font-bold tracking-[0.2em] uppercase text-xs">
+                  Curated Selection
+                </span>
+                <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0F172A] mt-2 tracking-tight">
+                  The Shortlist Preview
+                </h2>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          </ScrollReveal>
 
-      {/* Stats line */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        <div className="flex items-center justify-center gap-6 md:gap-10 text-base text-[#6B7280] flex-wrap">
-          <span className="flex items-center gap-2">
-            <span className="font-black text-xl text-[#111827]">500+</span> Universities
-          </span>
-          <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full hidden md:block" />
-          <span className="flex items-center gap-2">
-            <span className="font-black text-xl text-[#111827]">50+</span> Countries
-          </span>
-          <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full hidden md:block" />
-          <span className="flex items-center gap-2">
-            <span className="font-black text-xl text-[#111827]">10,000+</span> Programs
-          </span>
+          {/* Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {previewUniversities.map((uni, i) => (
+              <ScrollReveal key={uni.abbr} delay={i * 100}>
+                <div className="bg-white p-6 rounded-2xl shadow-[0_4px_24px_rgba(15,23,42,0.04)] border border-[#E2E8F0] flex flex-col h-full hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                  {/* Top row */}
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-12 h-12 bg-[#F1F5F9] rounded-xl flex items-center justify-center font-bold text-[#0F172A] text-sm">
+                      {uni.abbr}
+                    </div>
+                    <span className="text-[11px] bg-[#EFF6FF] text-[#3B82F6] font-bold uppercase px-2.5 py-1 rounded-full">
+                      Rank {uni.rank}
+                    </span>
+                  </div>
+
+                  {/* Name + location */}
+                  <h4 className="text-lg font-bold text-[#0F172A] mb-1 leading-tight">{uni.name}</h4>
+                  <p className="text-sm text-[#64748B] mb-6">{uni.location}</p>
+
+                  {/* Stats */}
+                  <div className="space-y-3 mb-6 flex-grow">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Fit Score</span>
+                      <span className="text-sm font-bold text-[#F59E0B]">{uni.fitScore}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Avg Tuition</span>
+                      <span className="text-sm font-bold text-[#0F172A]">{uni.tuition}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">Admit Prob.</span>
+                      <span className={`text-sm font-bold ${uni.admitColor}`}>{uni.admitProb}</span>
+                    </div>
+                  </div>
+
+                  {/* CTA button — solid soft fill (not outline) */}
+                  <button className="w-full py-3 text-sm font-bold bg-[#F1F5F9] text-[#0F172A] rounded-xl hover:bg-[#0F172A] hover:text-white transition-all duration-300">
+                    View Details
+                  </button>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
