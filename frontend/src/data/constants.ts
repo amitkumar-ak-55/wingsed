@@ -4,22 +4,22 @@
 
 // Countries for the logo strip and onboarding
 export const COUNTRIES = [
-  { value: "United States", label: "United States", flag: "🇺🇸" },
-  { value: "United Kingdom", label: "United Kingdom", flag: "🇬🇧" },
-  { value: "Canada", label: "Canada", flag: "🇨🇦" },
-  { value: "Australia", label: "Australia", flag: "🇦🇺" },
-  { value: "Germany", label: "Germany", flag: "🇩🇪" },
-  { value: "Ireland", label: "Ireland", flag: "🇮🇪" },
-  { value: "Netherlands", label: "Netherlands", flag: "🇳🇱" },
-  { value: "Italy", label: "Italy", flag: "🇮🇹" },
-  { value: "France", label: "France", flag: "🇫🇷" },
-  { value: "Spain", label: "Spain", flag: "🇪🇸" },
-  { value: "United Arab Emirates", label: "UAE", flag: "🇦🇪" },
-  { value: "Saudi Arabia", label: "Saudi Arabia", flag: "🇸🇦" },
-  { value: "New Zealand", label: "New Zealand", flag: "🇳🇿" },
-  { value: "Singapore", label: "Singapore", flag: "🇸🇬" },
-  { value: "Hong Kong", label: "Hong Kong", flag: "🇭🇰" },
-  { value: "South Korea", label: "South Korea", flag: "🇰🇷" },
+  { value: "United States", label: "United States", flag: "🇺🇸", code: "US", jobOutcomes: "High", admitDifficulty: "High", cost: "High" },
+  { value: "United Kingdom", label: "United Kingdom", flag: "🇬🇧", code: "GB", jobOutcomes: "High", admitDifficulty: "Medium", cost: "High" },
+  { value: "Germany", label: "Germany", flag: "🇩🇪", code: "DE", jobOutcomes: "High", admitDifficulty: "Medium", cost: "Low" },
+  { value: "Canada", label: "Canada", flag: "🇨🇦", code: "CA", jobOutcomes: "High", admitDifficulty: "High", cost: "Medium" },
+  { value: "Australia", label: "Australia", flag: "🇦🇺", code: "AU", jobOutcomes: "High", admitDifficulty: "Medium", cost: "High" },
+  { value: "Ireland", label: "Ireland", flag: "🇮🇪", code: "IE", jobOutcomes: "High", admitDifficulty: "Medium", cost: "Medium" },
+  { value: "Netherlands", label: "Netherlands", flag: "🇳🇱", code: "NL", jobOutcomes: "High", admitDifficulty: "Medium", cost: "Medium" },
+  { value: "Italy", label: "Italy", flag: "🇮🇹", code: "IT", jobOutcomes: "Medium", admitDifficulty: "Low", cost: "Low" },
+  { value: "France", label: "France", flag: "🇫🇷", code: "FR", jobOutcomes: "Medium", admitDifficulty: "Medium", cost: "Low" },
+  { value: "Spain", label: "Spain", flag: "🇪🇸", code: "ES", jobOutcomes: "Medium", admitDifficulty: "Low", cost: "Low" },
+  { value: "United Arab Emirates", label: "AE", flag: "🇦🇪", code: "AE", jobOutcomes: "High", admitDifficulty: "High", cost: "High" },
+  { value: "Saudi Arabia", label: "Saudi Arabia", flag: "🇸🇦", code: "SA", jobOutcomes: "High", admitDifficulty: "High", cost: "Medium" },
+  { value: "New Zealand", label: "New Zealand", flag: "🇳🇿", code: "NZ", jobOutcomes: "Medium", admitDifficulty: "Low", cost: "High" },
+  { value: "Singapore", label: "Singapore", flag: "🇸🇬", code: "SG", jobOutcomes: "High", admitDifficulty: "High", cost: "High" },
+  { value: "Hong Kong", label: "Hong Kong", flag: "🇭🇰", code: "HK", jobOutcomes: "High", admitDifficulty: "Medium", cost: "High" },
+  { value: "South Korea", label: "South Korea", flag: "🇰🇷", code: "KR", jobOutcomes: "High", admitDifficulty: "High", cost: "Medium" },
 ] as const;
 
 // Field of study options for onboarding dropdown

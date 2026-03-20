@@ -22,7 +22,7 @@ export function Header() {
   const visibleLinks = navLinks.filter(link => !link.authRequired || isSignedIn);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b-2 border-[#111827]">
+    <header className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-xl border-b border-[#E2E8F0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -43,7 +43,7 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[#374151] hover:text-[#111827] transition-colors text-sm font-medium flex items-center gap-1"
+                className="text-[#64748B] hover:text-[#0F172A] transition-colors text-sm font-medium flex items-center gap-1"
               >
                 {link.icon === "heart" && (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +72,7 @@ export function Header() {
                 ) : (
                   <Link
                     href="/sign-in"
-                    className="text-[#374151] hover:text-[#111827] transition-colors text-sm font-medium"
+                    className="text-[#64748B] hover:text-[#0F172A] transition-colors text-sm font-medium"
                   >
                     Sign In
                   </Link>
@@ -85,7 +85,7 @@ export function Header() {
           <div className="flex items-center gap-3">
             <Link
               href="/onboarding"
-              className="hidden sm:inline-flex px-5 py-2.5 bg-[#111827] text-white text-sm font-medium rounded-full hover:bg-[#374151] transition-colors border-2 border-[#111827]"
+              className="hidden sm:inline-flex px-5 py-2.5 bg-[#0F172A] text-white text-sm font-medium rounded-full hover:bg-[#1E293B] transition-all duration-300 shadow-sm hover:shadow-md"
             >
               Request a quote
             </Link>
@@ -93,7 +93,7 @@ export function Header() {
             {/* Mobile menu button */}
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[#6B7280] hover:text-[#111827] transition-colors"
+              className="md:hidden p-2 text-[#64748B] hover:text-[#0F172A] transition-colors"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
@@ -111,14 +111,14 @@ export function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4 animate-fadeIn">
+          <div className="md:hidden border-t border-[#E2E8F0] py-4 animate-fade-in">
             <nav className="flex flex-col gap-1">
               {visibleLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-4 py-3 text-[#64748B] hover:bg-[#F8FAFC] rounded-lg transition-colors"
                 >
                   {link.icon === "heart" && (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,19 +144,19 @@ export function Header() {
                 </Link>
               ))}
               
-              <div className="border-t border-gray-200 mt-2 pt-2">
+              <div className="border-t border-[#E2E8F0] mt-2 pt-2">
                 {isLoaded && (
                   <>
                     {isSignedIn ? (
                       <div className="px-4 py-3 flex items-center gap-3">
                         <UserButton afterSignOutUrl="/" />
-                        <span className="text-sm text-[#6B7280]">My Account</span>
+                        <span className="text-sm text-[#64748B]">My Account</span>
                       </div>
                     ) : (
                       <Link
                         href="/sign-in"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-3 text-[#374151] hover:bg-gray-50 rounded-lg transition-colors"
+                        className="flex items-center gap-2 px-4 py-3 text-[#64748B] hover:bg-[#F8FAFC] rounded-lg transition-colors"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -170,7 +170,7 @@ export function Header() {
                 <Link
                   href="/onboarding"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 mx-4 mt-2 px-4 py-3 bg-[#111827] text-white rounded-full font-medium hover:bg-[#374151] transition-colors"
+                  className="flex items-center justify-center gap-2 mx-4 mt-2 px-4 py-3 bg-[#0F172A] text-white rounded-full font-medium hover:bg-[#1E293B] transition-colors"
                 >
                   Request a quote
                 </Link>

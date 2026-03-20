@@ -176,7 +176,19 @@ export default function OnboardingPage() {
       router.push("/universities");
     } catch (error: unknown) {
       console.error("Failed to complete onboarding:", error);
-      const message = error instanceof Error ? error.message : "Something went wrong";
+      let message = error instanceof Error ? error.message : "Something went wrong";
+      
+      try {
+        // Try parsing assuming the API passed back Zod stringified arrays
+        const parsed = JSON.parse(message);
+        if (Array.isArray(parsed)) {
+          // Extract just the clean messages out of the Zod error array
+          message = parsed.map((e: any) => e.message || "Invalid value").join(" • ");
+        }
+      } catch (e) {
+        // If it's not JSON, just keep the raw message
+      }
+      
       setErrors({ submit: message });
     } finally {
       setIsSubmitting(false);
@@ -237,8 +249,8 @@ export default function OnboardingPage() {
                       type="button"
                       onClick={() => toggleCountry(country.value)}
                       className={`p-4 rounded-xl border-2 transition-all ${isSelected
-                          ? "border-[#2563EB] bg-[#2563EB]/5"
-                          : "border-[#E5E7EB] hover:border-[#2563EB]/50"
+                        ? "border-[#2563EB] bg-[#2563EB]/5"
+                        : "border-[#E5E7EB] hover:border-[#2563EB]/50"
                         }`}
                     >
                       <span className="text-2xl block mb-1">{country.flag}</span>
@@ -303,8 +315,8 @@ export default function OnboardingPage() {
                           updateField("budgetMax", range.max);
                         }}
                         className={`p-4 rounded-xl border-2 text-left transition-all ${isSelected
-                            ? "border-[#2563EB] bg-[#2563EB]/5"
-                            : "border-[#E5E7EB] hover:border-[#2563EB]/50"
+                          ? "border-[#2563EB] bg-[#2563EB]/5"
+                          : "border-[#E5E7EB] hover:border-[#2563EB]/50"
                           }`}
                       >
                         <span className="font-medium text-[#111827]">
@@ -382,8 +394,8 @@ export default function OnboardingPage() {
                       type="button"
                       onClick={() => toggleTest(test.value)}
                       className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all ${isSelected
-                          ? "border-[#2563EB] bg-[#2563EB] text-white"
-                          : "border-[#E5E7EB] text-[#374151] hover:border-[#2563EB]/50"
+                        ? "border-[#2563EB] bg-[#2563EB] text-white"
+                        : "border-[#E5E7EB] text-[#374151] hover:border-[#2563EB]/50"
                         }`}
                     >
                       {test.label}

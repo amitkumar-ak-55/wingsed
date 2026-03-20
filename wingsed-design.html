@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WingsEd | The Decision-First Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .metallic-gradient {
+            background: linear-gradient(135deg, #F59E0B 0%, #855300 100%);
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-surface": "#191c1e",
+                "on-primary-fixed": "#131b2e",
+                "surface-container": "#eceef0",
+                "on-primary-fixed-variant": "#3f465c",
+                "secondary-container": "#fea619",
+                "inverse-on-surface": "#eff1f3",
+                "surface": "#f7f9fb",
+                "on-secondary-container": "#684000",
+                "primary": "#000000",
+                "primary-fixed": "#dae2fd",
+                "surface-container-high": "#e6e8ea",
+                "primary-container": "#131b2e",
+                "surface-container-low": "#f2f4f6",
+                "tertiary-fixed-dim": "#b7c8e1",
+                "secondary-fixed-dim": "#ffb95f",
+                "inverse-surface": "#2d3133",
+                "on-tertiary-fixed-variant": "#38485d",
+                "secondary": "#855300",
+                "on-background": "#191c1e",
+                "surface-dim": "#d8dadc",
+                "on-secondary-fixed": "#2a1700",
+                "error-container": "#ffdad6",
+                "surface-tint": "#565e74",
+                "on-tertiary-fixed": "#0b1c30",
+                "on-error-container": "#93000a",
+                "surface-variant": "#e0e3e5",
+                "on-secondary-fixed-variant": "#653e00",
+                "tertiary-fixed": "#d3e4fe",
+                "outline-variant": "#c6c6cd",
+                "tertiary": "#000000",
+                "on-secondary": "#ffffff",
+                "surface-bright": "#f7f9fb",
+                "on-surface-variant": "#45464d",
+                "primary-fixed-dim": "#bec6e0",
+                "outline": "#76777d",
+                "surface-container-lowest": "#ffffff",
+                "secondary-fixed": "#ffddb8",
+                "inverse-primary": "#bec6e0",
+                "tertiary-container": "#0b1c30",
+                "surface-container-highest": "#e0e3e5",
+                "on-tertiary": "#ffffff",
+                "error": "#ba1a1a",
+                "on-primary": "#ffffff",
+                "on-primary-container": "#7c839b",
+                "background": "#f7f9fb",
+                "on-tertiary-container": "#75859d",
+                "on-error": "#ffffff"
+              },
+              fontFamily: {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl tonal-transition shadow-[0_20px_40px_rgba(15,23,42,0.06)] dark:shadow-none h-20">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-8 h-full">
+<div class="text-xl font-bold tracking-tighter text-slate-900 dark:text-slate-50">WingsEd</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-amber-600 dark:text-amber-400 border-b-2 border-amber-500 pb-1 text-xs font-semibold uppercase tracking-widest" href="#">Strategy</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors text-xs font-semibold uppercase tracking-widest" href="#">Universities</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors text-xs font-semibold uppercase tracking-widest" href="#">Success</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors text-xs font-semibold uppercase tracking-widest" href="#">About</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="metallic-gradient text-on-secondary px-6 py-2.5 rounded text-xs font-bold uppercase tracking-widest active:scale-95 duration-150 ease-in-out">
+                    Consultation
+                </button>
+</div>
+</div>
+</nav>
+<!-- Hero Section: Decision Engine -->
+<header class="relative pt-32 pb-24 overflow-hidden bg-primary-container">
+<!-- Background Architectural Motif -->
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<div class="absolute top-0 right-0 w-1/2 h-full border-l border-outline-variant/20"></div>
+<div class="absolute top-1/4 left-0 w-full h-px border-t border-outline-variant/20"></div>
+</div>
+<div class="max-w-7xl mx-auto px-8 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+<!-- Content Left -->
+<div>
+<span class="inline-block text-secondary font-bold tracking-[0.2em] uppercase text-xs mb-6">The Decision-First Architect</span>
+<h1 class="text-white text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-8">
+                    Shortlist Universities That <span class="text-secondary">Actually Fit You.</span>
+</h1>
+<p class="text-on-primary-container text-lg max-w-lg mb-12">
+                    Stop guessing. Use architectural precision and historical data to engineer your global education journey.
+                </p>
+<div class="flex items-center gap-6">
+<div class="flex -space-x-3">
+<img class="w-12 h-12 rounded-full border-2 border-primary-container object-cover" data-alt="Close up portrait of a male student" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtxzb3xp8kK6sCeqghz8Tx0RwF-RHRc2Wgw9_SDIjfFLkgKImnU8yPNmvTmTYQo7_zdwFdU8RIQwzD-ZwbWs1beqbTEMqjo3EXqbAS6fU67X72qWTbiEQc9Z6tmMvGjTG4oH38pokY6G8FZUljaWdUwjA0nhsDBNH3F8d2H6DAx-UamtIgXQxz235VJDzBX-qQXX9ARCEU8XDf7qwAHSXVhRRdB9QH5Male2E3B5mCh1OZhjm-TVbPIP1TJVt84W41-J2e4Q1vc-0"/>
+<img class="w-12 h-12 rounded-full border-2 border-primary-container object-cover" data-alt="Close up portrait of a female student" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzllSDiSP97ois0TE69A61rZ7qfywWcbU7gSrLloEP28CbCAokmSxiRzF2cIJzVbP3oWAZIWg7h99HIkmyBNkEA0cjOZR2FlAZWe-EwqrVtOl7SpPk9-71niORy_lrOgEP5cdEO9pqm75uRfz2_EJYnZ-PUnjuY_LVQaHBWbW0jQi_w3WcMdGtnvfxSLbNLQ9vVyLWrX6J75z-axtoH51k_1UbbJYAyrLSoo56a-gBjNioXFnTLSogrRrX0QjjXTeFVlvwdqqhAOM"/>
+<div class="w-12 h-12 rounded-full border-2 border-primary-container bg-secondary-container flex items-center justify-center text-xs font-bold text-on-secondary-container">98%</div>
+</div>
+<span class="text-white text-sm font-medium">Join 10k+ successful alumni</span>
+</div>
+</div>
+<!-- Decision Engine Widget -->
+<div class="glass-panel rounded-xl p-8 border border-white/10 shadow-2xl">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-primary-container font-bold text-xl">Decision Engine v2.0</h3>
+<span class="text-[10px] bg-primary-container text-white px-2 py-1 rounded font-bold uppercase tracking-widest">Live Engine</span>
+</div>
+<div class="space-y-6">
+<!-- Inputs -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">GPA (Scale 4.0)</label>
+<input class="w-full bg-surface-container-low border-b-2 border-surface-variant p-3 focus:border-secondary focus:ring-0 outline-none text-primary-container font-bold" step="0.1" type="number" value="3.8"/>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Country</label>
+<select class="w-full bg-surface-container-low border-b-2 border-surface-variant p-3 focus:border-secondary focus:ring-0 outline-none text-primary-container font-bold">
+<option>USA</option>
+<option>Germany</option>
+<option>UK</option>
+</select>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Budget Range</label>
+<span class="text-xs font-bold text-secondary">₹40L - ₹60L</span>
+</div>
+<input class="w-full accent-secondary h-1 bg-surface-container-high rounded-full appearance-none" type="range"/>
+</div>
+<!-- Live Insights -->
+<div class="pt-6 border-t border-outline-variant/15 space-y-4">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Profile Strength</p>
+<p class="text-xl font-bold text-primary-container">Strong</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Admit Prob.</p>
+<p class="text-xl font-bold text-secondary">85%</p>
+</div>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full metallic-gradient w-[85%]"></div>
+</div>
+<!-- Matches Preview -->
+<div class="space-y-3 pt-4">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Architect's Selection</p>
+<div class="flex gap-2">
+<div class="flex-1 bg-surface-container-lowest p-3 rounded border border-outline-variant/10 text-center">
+<div class="text-[10px] font-bold mb-1">MIT</div>
+<div class="text-[8px] text-green-600 font-bold uppercase">Safe</div>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-3 rounded border border-outline-variant/10 text-center">
+<div class="text-[10px] font-bold mb-1">TU Munich</div>
+<div class="text-[8px] text-amber-600 font-bold uppercase">Target</div>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-3 rounded border border-outline-variant/10 text-center">
+<div class="text-[10px] font-bold mb-1">Imperial</div>
+<div class="text-[8px] text-blue-600 font-bold uppercase">Reach</div>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full metallic-gradient text-on-secondary py-4 rounded font-bold uppercase tracking-widest text-sm shadow-xl shadow-secondary/20">
+                        Get Full Shortlist
+                    </button>
+</div>
+</div>
+</div>
+</header>
+<!-- Trust Bar -->
+<section class="bg-surface-container-lowest py-12 border-b border-outline-variant/5">
+<div class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<div class="text-center">
+<p class="text-3xl font-black text-primary-container">10,000+</p>
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Students Placed</p>
+</div>
+<div class="text-center">
+<p class="text-3xl font-black text-primary-container">500+</p>
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Partner Universities</p>
+</div>
+<div class="text-center">
+<p class="text-3xl font-black text-primary-container">98%</p>
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Visa Success Rate</p>
+</div>
+<div class="text-center">
+<p class="text-3xl font-black text-primary-container">₹120Cr+</p>
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-1">Scholarships Secured</p>
+</div>
+</div>
+</div>
+</section>
+<!-- University Carousel -->
+<section class="py-24 bg-surface">
+<div class="max-w-7xl mx-auto px-8">
+<div class="flex justify-between items-end mb-12">
+<div>
+<span class="text-secondary font-bold tracking-widest uppercase text-xs">Curated Selection</span>
+<h2 class="text-4xl font-bold text-primary-container mt-2 tracking-tight">The Shortlist Preview</h2>
+</div>
+<div class="flex gap-4">
+<button class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center hover:bg-white transition-all">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<button class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center hover:bg-white transition-all">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="flex gap-6 overflow-x-auto hide-scrollbar pb-8 -mx-4 px-4">
+<!-- University Card 1 -->
+<div class="min-w-[320px] bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(15,23,42,0.04)] border border-outline-variant/10 flex flex-col">
+<div class="flex items-start justify-between mb-6">
+<div class="w-12 h-12 bg-surface-container-low rounded-lg flex items-center justify-center font-bold text-primary-container">MIT</div>
+<div class="bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold uppercase px-2 py-1 rounded">Rank #1</div>
+</div>
+<h4 class="text-xl font-bold text-primary-container mb-1">Massachusetts Institute of Technology</h4>
+<p class="text-on-surface-variant text-sm mb-6">Cambridge, USA</p>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Fit Score</span>
+<span class="text-sm font-bold text-secondary">92%</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Avg Tuition</span>
+<span class="text-sm font-bold text-primary-container">₹45L/Yr</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Admit Prob.</span>
+<span class="text-sm font-bold text-green-600">85%</span>
+</div>
+</div>
+<button class="mt-auto w-full py-3 text-sm font-bold border border-outline-variant rounded hover:bg-primary-container hover:text-white transition-all">
+                        View Details
+                    </button>
+</div>
+<!-- University Card 2 -->
+<div class="min-w-[320px] bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(15,23,42,0.04)] border border-outline-variant/10 flex flex-col">
+<div class="flex items-start justify-between mb-6">
+<div class="w-12 h-12 bg-surface-container-low rounded-lg flex items-center justify-center font-bold text-primary-container">TUM</div>
+<div class="bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold uppercase px-2 py-1 rounded">Rank #50</div>
+</div>
+<h4 class="text-xl font-bold text-primary-container mb-1">Technical University of Munich</h4>
+<p class="text-on-surface-variant text-sm mb-6">Munich, Germany</p>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Fit Score</span>
+<span class="text-sm font-bold text-secondary">95%</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Avg Tuition</span>
+<span class="text-sm font-bold text-primary-container">₹0 - ₹2L/Yr</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Admit Prob.</span>
+<span class="text-sm font-bold text-amber-600">65%</span>
+</div>
+</div>
+<button class="mt-auto w-full py-3 text-sm font-bold border border-outline-variant rounded hover:bg-primary-container hover:text-white transition-all">
+                        View Details
+                    </button>
+</div>
+<!-- University Card 3 -->
+<div class="min-w-[320px] bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(15,23,42,0.04)] border border-outline-variant/10 flex flex-col">
+<div class="flex items-start justify-between mb-6">
+<div class="w-12 h-12 bg-surface-container-low rounded-lg flex items-center justify-center font-bold text-primary-container">ICL</div>
+<div class="bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold uppercase px-2 py-1 rounded">Rank #6</div>
+</div>
+<h4 class="text-xl font-bold text-primary-container mb-1">Imperial College London</h4>
+<p class="text-on-surface-variant text-sm mb-6">London, UK</p>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Fit Score</span>
+<span class="text-sm font-bold text-secondary">88%</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Avg Tuition</span>
+<span class="text-sm font-bold text-primary-container">₹38L/Yr</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Admit Prob.</span>
+<span class="text-sm font-bold text-amber-600">72%</span>
+</div>
+</div>
+<button class="mt-auto w-full py-3 text-sm font-bold border border-outline-variant rounded hover:bg-primary-container hover:text-white transition-all">
+                        View Details
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Student Success Stories -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-8">
+<div class="mb-16">
+<span class="text-secondary font-bold tracking-widest uppercase text-xs">Architecting Outcomes</span>
+<h2 class="text-4xl font-bold text-primary-container mt-2 tracking-tight">Student Success Stories</h2>
+</div>
+<div class="grid lg:grid-cols-2 gap-8">
+<!-- Testimonial Card 1 -->
+<div class="bg-surface-container-lowest p-8 flex flex-col md:flex-row gap-8 items-center border border-outline-variant/10">
+<div class="w-48 h-64 shrink-0 bg-surface-container rounded overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a student in a suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY_XMuePMOS-Io4iM068kfOo8iAIkYNnx2s3IRWPSrp7VKeWwnKNT-1JSIMAbAX43xrSHWc_gIP0w-kzYUh4KfNpZ8c8u_6FMJm3Z0ZOkaQVMY4B0dCeVl0V2WcqVXTNo7HNh0wdTOn9tK3pAQ4z8LFdZfYkOcItp2bBQXQB1HVwhXcnRyX6ySfgr41z8800BW_OjeoZz1R2KTiyWRvH4awgM6162KwHO5YL0vRL6Nz7tLzXOsj_VRUkjSkeuRLq1zbiJdzDX2vWo"/>
+</div>
+<div class="flex-1">
+<div class="flex gap-1 mb-4">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<h4 class="text-2xl font-bold text-primary-container mb-2">Nothari Suran</h4>
+<p class="text-on-surface-variant text-sm font-medium mb-6">Previous: Tier 2 College | Final: <span class="text-primary-container">TU Munich, RWTH Aachen</span></p>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 bg-surface rounded">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Outcome</p>
+<p class="text-sm font-bold text-primary-container">3 Admits</p>
+</div>
+<div class="p-3 bg-surface rounded">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Funding</p>
+<p class="text-sm font-bold text-secondary">₹18L Scholarship</p>
+</div>
+</div>
+<p class="mt-6 text-on-surface-variant italic leading-relaxed">"The AI engine caught details in my profile that consultants missed. I went from a Tier 2 college to a world-class German University."</p>
+</div>
+</div>
+<!-- Testimonial Card 2 -->
+<div class="bg-surface-container-lowest p-8 flex flex-col md:flex-row gap-8 items-center border border-outline-variant/10">
+<div class="w-48 h-64 shrink-0 bg-surface-container rounded overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a female student in academic environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPRwCdvbJcMrF-FOHpI7Rhy9qZRuUJNhL6p-znLZ0nd3SjW3g717hmHcoEFZIjlP0m8Yd4UHVjO4gxNuhjaJ7JuYQPBc4m6oFHjkAku_xKV3vP9tVrN_KU1RU9JgDD4TbNbPGXlWk2aGbFDzxjYbzyClohgcDL6n6ILfuI5xl8qHRNGVGq9-YXPRsqBtf9MW0ARgTXGRmQ3eil3HM-23yCdz07sMeUsu1iw4oFUT9AS0MQi4MBS5mMJ3UkrQTQeImawo3xR9IdAlY"/>
+</div>
+<div class="flex-1">
+<div class="flex gap-1 mb-4">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<h4 class="text-2xl font-bold text-primary-container mb-2">Ananya Verma</h4>
+<p class="text-on-surface-variant text-sm font-medium mb-6">Previous: Liberal Arts Major | Final: <span class="text-primary-container">UPenn, Columbia University</span></p>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 bg-surface rounded">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Outcome</p>
+<p class="text-sm font-bold text-primary-container">Ivy League Admit</p>
+</div>
+<div class="p-3 bg-surface rounded">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Funding</p>
+<p class="text-sm font-bold text-secondary">Fully Funded RA</p>
+</div>
+</div>
+<p class="mt-6 text-on-surface-variant italic leading-relaxed">"WingsEd treats your career like an architectural project. Precise, structured, and focused on the end goal."</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Why This Works -->
+<section class="py-24 bg-surface-container-lowest overflow-hidden">
+<div class="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-16 items-center">
+<div class="relative">
+<div class="aspect-square bg-surface-container rounded-xl overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover grayscale contrast-125" data-alt="Modern architectural glass building reflecting the sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpkQ4Pi9YERTEM8FFR_ftwAl5jCjB9e-S9F1pLIQMczCBTnWPTloSZ-TnItWIuAc696SEDdYmB5xNz52Aa3saiK5ODC0fd2LnXBMYFsFl3_EWzwrOYgvgyKOBAQoyr-pSFiujl39q1nlCxszwwiK2RUA6XGHb740zzSs3c0V_8vJvwVwZDWMHzAXLaKHsVgtTu4XM1EX4f4BP2twnqfRkgYvUkljEGd706VqBxPjVrkREKWy-L28Px4qdJnIoijrcn8c1ZSZN087o"/>
+</div>
+<!-- Float Insight -->
+<div class="absolute -bottom-8 -right-8 glass-panel p-6 border border-outline-variant/20 shadow-xl max-w-xs">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<p class="text-sm font-bold text-primary-container uppercase tracking-tight">AI + Human Sherpa</p>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">Our logic engine processes 10M+ data points to ensure your architected path is valid and high-probability.</p>
+</div>
+</div>
+<div>
+<span class="text-secondary font-bold tracking-widest uppercase text-xs">The Logic</span>
+<h2 class="text-4xl font-bold text-primary-container mt-2 mb-12 tracking-tight">Why Our Framework Works</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+<div class="space-y-4">
+<div class="w-12 h-12 bg-surface-container-low rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" data-icon="school">school</span>
+</div>
+<h4 class="text-lg font-bold text-primary-container">GPA Matching</h4>
+<p class="text-sm text-on-surface-variant">Analyzing historical cut-offs against real-time applicant pools.</p>
+</div>
+<div class="space-y-4">
+<div class="w-12 h-12 bg-surface-container-low rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<h4 class="text-lg font-bold text-primary-container">Budget Optimization</h4>
+<p class="text-sm text-on-surface-variant">Mapping cost of living, tuition, and guaranteed scholarship triggers.</p>
+</div>
+<div class="space-y-4">
+<div class="w-12 h-12 bg-surface-container-low rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" data-icon="flag">flag</span>
+</div>
+<h4 class="text-lg font-bold text-primary-container">Goal Alignment</h4>
+<p class="text-sm text-on-surface-variant">Career-path tracing to identify which alumni network holds your future job.</p>
+</div>
+<div class="space-y-4">
+<div class="w-12 h-12 bg-surface-container-low rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" data-icon="query_stats">query_stats</span>
+</div>
+<h4 class="text-lg font-bold text-primary-container">Admit Data</h4>
+<p class="text-sm text-on-surface-variant">Proprietary dataset of 10 years of international admission cycles.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-24 bg-primary-container relative">
+<div class="max-w-7xl mx-auto px-8 text-center relative z-10">
+<h2 class="text-white text-4xl md:text-6xl font-bold tracking-tight mb-8">Let’s Architect Your<br/>Global Future.</h2>
+<p class="text-on-primary-container text-lg mb-12 max-w-2xl mx-auto">Skip the generic counseling sessions. Get an engineered shortlist built for your specific profile today.</p>
+<div class="flex flex-col sm:flex-row gap-6 justify-center">
+<button class="metallic-gradient text-on-secondary px-10 py-5 rounded font-bold uppercase tracking-widest text-sm shadow-2xl">
+                    Get Free Shortlist
+                </button>
+<button class="bg-transparent border border-outline-variant/30 text-white px-10 py-5 rounded font-bold uppercase tracking-widest text-sm hover:bg-white/5 transition-all">
+                    Talk to an Expert
+                </button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-[#131B2E] dark:bg-[#0A0F1D] pt-16 pb-8 tonal-shift from surface to midnight">
+<div class="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-1">
+<div class="text-2xl font-black text-white mb-6">WingsEd</div>
+<p class="text-slate-400 font-medium text-sm leading-relaxed">Architecting global futures through AI-driven precision and elite human strategy.</p>
+</div>
+<div>
+<h5 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Platform</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">Decision Engine</a></li>
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">Admissions Portal</a></li>
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">University Finder</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Ecosystem</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">Institutional Partners</a></li>
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">Scholarship Lab</a></li>
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">Alumni Network</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Support</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">Privacy Policy</a></li>
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">Contact</a></li>
+<li><a class="text-slate-400 hover:text-white transition-colors text-sm font-medium hover:underline decoration-amber-500 underline-offset-4" href="#">FAQ</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-8 mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-slate-400 font-medium text-xs">© 2024 WingsEd Intelligence. Architecting Global Futures.</p>
+<div class="flex gap-6">
+<a class="text-slate-400 hover:text-amber-400 transition-colors" href="#"><span class="material-symbols-outlined text-lg">language</span></a>
+<a class="text-slate-400 hover:text-amber-400 transition-colors" href="#"><span class="material-symbols-outlined text-lg">public</span></a>
+<a class="text-slate-400 hover:text-amber-400 transition-colors" href="#"><span class="material-symbols-outlined text-lg">business_center</span></a>
+</div>
+</div>
+</footer>
+</body></html>
