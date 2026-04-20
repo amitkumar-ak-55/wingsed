@@ -333,3 +333,49 @@ Audit scope: Repository truth from current files in root, backend, frontend, and
 - Updated backend architecture to reflect empty scripts folder and no active Typesense module.
 - Rewrote data flow to include current endpoint inventory and service behavior.
 - Added explicit residual traces section so removed or replaced logic is tracked without being mistaken as active.
+
+## 11. Recent Design Changes and Key Page Decisions (Spring 2026)
+
+### Global
+- Adopted Navy (#0F172A) + Gold (#F59E0B) brand palette across all pages, replacing legacy hex codes with design tokens from globals.css.
+- Standardized CTA hierarchy: primary CTA (navy/white), secondary CTA (outlined/surface), consistent button and card radii.
+- Typography: All major headers use display font and spacing rhythm.
+- Accessibility: Icon-only buttons require labels, color is not sole status indicator.
+
+### Landing Page (/)
+- Hero section rewritten with interactive Decision Engine widget.
+- Added value props, trust bar, before/after testimonials, advisor chat section, and new hero illustration.
+- Visual hierarchy and CTA prominence strictly enforced.
+
+### Universities Listing (/universities)
+- Section headings and filter surfaces use brand tokens and landing-style hierarchy.
+- Cards restyled for clarity, gold for highlights, blue for interactive states.
+- Empty state and error/loading UI unified with landing tone and CTA.
+
+### University Detail (/universities/[id])
+- Hero summary, stat cards, and tabbed details use consistent card and heading patterns.
+- Supporting actions (save, track, WhatsApp) styled to match brand.
+
+### Compare (/compare)
+- Compare matrix restyled to match landing card system.
+- Empty state matches landing tone and CTA.
+
+### Onboarding (/onboarding)
+- Form progression uses gold for progress, navy for structure.
+- Final CTA matches primary brand CTA.
+
+### Dashboard (Saved/Applications)
+- Sparse states upgraded with action-oriented cards and clear next step CTAs.
+- Consistent iconography, spacing, and status semantics.
+
+### Admin
+- Data grid, filters, and modals follow new card and button standards.
+
+### Legal (Privacy/Terms)
+- Legal pages use branded heading and spacing system for readability.
+
+### Reliability/Behavior
+- Fixed Universities API loading so cards render reliably.
+- Unified route transitions and error handling for consistent experience.
+
+See design.md for full standards and wingsed-design.html for visual patterns.
