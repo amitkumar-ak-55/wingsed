@@ -90,4 +90,4 @@ next-env.d.ts
 # pnpm-lock.yaml
 
 
-.github\prompts\*.md
+.github\prompts\

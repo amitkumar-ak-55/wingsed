@@ -11,6 +11,7 @@ import { formatINR, formatUSD, getCountryFlag } from "@/lib/utils";
 import type { University } from "@/types";
 
 const GUEST_SAVED_KEY = "wingsed_saved_universities";
+const USD_TO_INR_RATE = 83; // Fixed reference rate; update periodically.
 
 // Get saved universities from localStorage for guests
 function getGuestSavedIds(): string[] {
@@ -99,10 +100,10 @@ export default function SavedUniversitiesPage() {
           <span className="text-[#F59E0B] font-bold tracking-[0.2em] uppercase text-xs">
             My Shortlist
           </span>
-          <h1 className="font-display text-3xl font-extrabold text-[#0F172A] mt-1 mb-1">
+          <h1 className="font-display text-3xl font-extrabold text-[var(--foreground)] mt-1 mb-1">
             Saved Universities
           </h1>
-          <p className="text-[#64748B]">
+          <p className="text-[var(--text-secondary)]">
             {isSignedIn
               ? "Your shortlisted universities for easy access"
               : "Your shortlisted universities (sign in to save across devices)"}
@@ -159,7 +160,7 @@ export default function SavedUniversitiesPage() {
             {/* Recommendations when empty */}
             {recommendations.length > 0 && (
               <div className="mt-4 text-left">
-                <h3 className="font-display text-lg font-bold text-[#0F172A] mb-4 text-center">
+                <h3 className="font-display text-lg font-bold text-[var(--foreground)] mb-4 text-center">
                   ✨ Discover Popular Universities
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -174,11 +175,11 @@ export default function SavedUniversitiesPage() {
                             className="w-10 h-10 shrink-0 rounded-lg"
                           />
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-semibold text-[#0F172A] line-clamp-1">{uni.name}</h4>
-                            <p className="text-xs text-[#64748B]">{getCountryFlag(uni.country)} {uni.city}</p>
+                            <h4 className="text-sm font-semibold text-[var(--foreground)] line-clamp-1">{uni.name}</h4>
+                            <p className="text-xs text-[var(--text-secondary)]">{getCountryFlag(uni.country)} {uni.city}</p>
                           </div>
                         </div>
-                        <div className="text-sm font-medium text-[#0F172A]">{formatUSD(uni.tuitionFee)}/yr</div>
+                        <div className="text-sm font-medium text-[var(--foreground)]">{formatUSD(uni.tuitionFee)}/yr</div>
                       </Card>
                     </Link>
                   ))}
@@ -191,7 +192,7 @@ export default function SavedUniversitiesPage() {
         {/* Universities Grid */}
         {!isLoading && !error && universities.length > 0 && (
           <>
-            <div className="text-sm text-[#64748B] mb-4">
+            <div className="text-sm text-[var(--text-secondary)] mb-4">
               {universities.length} {universities.length === 1 ? "university" : "universities"} saved
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -216,10 +217,10 @@ export default function SavedUniversitiesPage() {
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="text-sm text-[#0F172A]">
+                <p className="text-sm text-[var(--foreground)]">
                   <strong>Want to access your saved universities on any device?</strong>
                 </p>
-                <p className="text-sm text-[#64748B]">
+                <p className="text-sm text-[var(--text-secondary)]">
                   Sign in to sync your shortlist across all your devices.
                 </p>
               </div>
@@ -273,11 +274,11 @@ function SavedUniversityCard({
         {/* Title and Location */}
         <div className="flex-1 min-w-0">
           <Link href={`/universities/${university.id}`}>
-            <h3 className="text-lg font-semibold text-[#0F172A] mb-1 line-clamp-2 hover:text-[#F59E0B] transition-colors cursor-pointer">
+            <h3 className="text-lg font-semibold text-[var(--foreground)] mb-1 line-clamp-2 hover:text-[#F59E0B] transition-colors cursor-pointer">
               {university.name}
             </h3>
           </Link>
-          <div className="flex items-center gap-2 text-sm text-[#64748B]">
+          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
             <span>{getCountryFlag(university.country)}</span>
             <span className="truncate">{university.city}, {university.country}</span>
           </div>
@@ -286,13 +287,13 @@ function SavedUniversityCard({
 
       {/* Fees */}
       <div className="mb-4 p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">
-        <div className="text-xs text-[#64748B] mb-1">Annual Tuition</div>
+        <div className="text-xs text-[var(--text-secondary)] mb-1">Annual Tuition</div>
         <div className="flex items-baseline gap-2">
-          <span className="text-lg font-bold text-[#0F172A]">
+          <span className="text-lg font-bold text-[var(--foreground)]">
             {formatUSD(university.tuitionFee)}
           </span>
-          <span className="text-sm text-[#64748B]">
-            ({formatINR(university.tuitionFee * 83)})
+          <span className="text-sm text-[var(--text-secondary)]">
+            ({formatINR(university.tuitionFee * USD_TO_INR_RATE)})
           </span>
         </div>
       </div>

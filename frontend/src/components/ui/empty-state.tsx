@@ -73,7 +73,7 @@ function CtaButton({
   }
 
   return (
-    <button onClick={cta.onClick} className={baseClass}>
+    <button type="button" onClick={cta.onClick} className={baseClass}>
       {cta.label}
     </button>
   );

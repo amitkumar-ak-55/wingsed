@@ -102,7 +102,11 @@ export default function ApplicationsPage() {
       <div className="min-h-screen flex flex-col" style={{ background: 'var(--background)' }}>
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <span className="w-8 h-8 rounded-full border-2 border-[#E2E8F0] border-t-[#F59E0B] animate-spin" />
+          <span
+            className="w-8 h-8 rounded-full border-2 border-[#E2E8F0] border-t-[#F59E0B] animate-spin"
+            role="status"
+            aria-label="Loading"
+          />
         </main>
         <Footer />
       </div>
