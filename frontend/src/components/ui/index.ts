@@ -12,3 +12,7 @@ export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 export { Skeleton, SkeletonText, SkeletonCard, SkeletonUniversityCard } from "./skeleton";
 
 export { Progress } from "./progress";
+
+export { EmptyState } from "./empty-state";
+
+export { ImageFallback } from "./image-fallback";

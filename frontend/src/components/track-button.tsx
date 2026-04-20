@@ -83,7 +83,7 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
       {variant === "labeled" ? (
         <button
           onClick={handleClick}
-          className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-all duration-200 text-[#6B7280] hover:text-[#2563EB] hover:bg-blue-50 ${className}`}
+          className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-all duration-200 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] ${className}`}
           title="Track application"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,14 +97,14 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
           className={`p-2 rounded-full bg-white/90 hover:bg-white shadow-sm transition-all duration-200 hover:scale-110 ${className}`}
           title="Track application"
         >
-          <svg className="w-5 h-5 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#0F172A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
         </button>
       ) : (
         <button
           onClick={handleClick}
-          className={`inline-flex items-center gap-2 px-4 py-2 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1D4ED8] transition-colors ${className}`}
+          className={`inline-flex items-center gap-2 px-4 py-2 bg-[#0F172A] text-white text-sm font-medium rounded-lg hover:bg-[#1E293B] transition-colors ${className}`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -132,7 +132,7 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
 
             {/* Header */}
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-[#111827] mb-1">Track Application</h2>
+              <h2 className="text-xl font-bold text-[#0F172A] mb-1">Track Application</h2>
               <p className="text-sm text-[#6B7280]">
                 Add <span className="font-medium">{universityName}</span> to your application tracker
               </p>
@@ -149,13 +149,13 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Status */}
               <div>
-                <label className="block text-sm font-medium text-[#111827] mb-1.5">
+                <label className="block text-sm font-medium text-[#0F172A] mb-1.5">
                   Status
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as ApplicationStatus)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30 focus:border-[#F59E0B]"
                 >
                   <option value="RESEARCHING">🔍 Researching</option>
                   <option value="PREPARING">📝 Preparing Documents</option>
@@ -167,7 +167,7 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
 
               {/* Program */}
               <div>
-                <label className="block text-sm font-medium text-[#111827] mb-1.5">
+                <label className="block text-sm font-medium text-[#0F172A] mb-1.5">
                   Program <span className="text-[#6B7280] font-normal">(optional)</span>
                 </label>
                 <input
@@ -175,13 +175,13 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
                   value={program}
                   onChange={(e) => setProgram(e.target.value)}
                   placeholder="e.g., MS Computer Science"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30 focus:border-[#F59E0B]"
                 />
               </div>
 
               {/* Intake */}
               <div>
-                <label className="block text-sm font-medium text-[#111827] mb-1.5">
+                <label className="block text-sm font-medium text-[#0F172A] mb-1.5">
                   Intake <span className="text-[#6B7280] font-normal">(optional)</span>
                 </label>
                 <input
@@ -189,7 +189,7 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
                   value={intake}
                   onChange={(e) => setIntake(e.target.value)}
                   placeholder="e.g., Fall 2025"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30 focus:border-[#F59E0B]"
                 />
               </div>
 
@@ -198,14 +198,14 @@ export function TrackButton({ universityId, universityName, variant = "icon", cl
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 text-[#374151] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 border border-[#E2E8F0] text-[#0F172A] rounded-lg text-sm font-medium hover:bg-[#F8FAFC] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2.5 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-[#1D4ED8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2.5 bg-[#0F172A] text-white rounded-lg text-sm font-medium hover:bg-[#1E293B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? "Adding..." : "Add to Tracker"}
                 </button>

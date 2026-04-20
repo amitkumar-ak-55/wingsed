@@ -14,7 +14,7 @@ export function CompareBar() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-[#2563EB] rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-[#0F172A] rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -25,7 +25,7 @@ export function CompareBar() {
                 </svg>
               </div>
               <div>
-                <p className="font-semibold text-[#111827]">
+                <p className="font-semibold text-[#0F172A]">
                   {compareIds.length} {compareIds.length === 1 ? "university" : "universities"} selected
                 </p>
                 <p className="text-sm text-[#6B7280]">

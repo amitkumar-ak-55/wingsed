@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Header, Footer } from "@/components";
+import { Header } from "@/components";
 import { Button, Input, Select, Progress, Card } from "@/components/ui";
 import { COUNTRIES, FIELDS_OF_STUDY, BUDGET_RANGES, TEST_OPTIONS } from "@/data/constants";
 import { onboardingSchema, type OnboardingFormData } from "@/lib/validations";
@@ -197,14 +197,14 @@ export default function OnboardingPage() {
 
   if (!isLoaded || !isSignedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2563EB]" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
+        <div className="w-12 h-12 rounded-full border-3 border-[#E2E8F0] border-t-[#F59E0B] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--background)' }}>
       <Header />
 
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-12">
@@ -219,7 +219,7 @@ export default function OnboardingPage() {
 
         {/* Welcome */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-[#111827] mb-2">
+          <h1 className="font-display text-2xl font-bold text-[#0F172A] mb-2">
             Welcome{user?.firstName ? `, ${user.firstName}` : ""}! 👋
           </h1>
           <p className="text-[#6B7280]">
@@ -232,7 +232,7 @@ export default function OnboardingPage() {
           {currentStep === 1 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-[#111827] mb-2">
+                <h2 className="text-xl font-semibold text-[#0F172A] mb-2">
                   Where do you want to study?
                 </h2>
                 <p className="text-[#6B7280] text-sm">
@@ -249,12 +249,12 @@ export default function OnboardingPage() {
                       type="button"
                       onClick={() => toggleCountry(country.value)}
                       className={`p-4 rounded-xl border-2 transition-all ${isSelected
-                        ? "border-[#2563EB] bg-[#2563EB]/5"
-                        : "border-[#E5E7EB] hover:border-[#2563EB]/50"
+                        ? "border-[#F59E0B] bg-[#F59E0B]/5"
+                        : "border-[#E2E8F0] hover:border-[#F59E0B]/50"
                         }`}
                     >
                       <span className="text-2xl block mb-1">{country.flag}</span>
-                      <span className="text-sm font-medium text-[#374151]">
+                      <span className="text-sm font-medium text-[#0F172A]">
                         {country.label}
                       </span>
                     </button>
@@ -267,8 +267,8 @@ export default function OnboardingPage() {
               )}
 
               {/* Free-text destination input */}
-              <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
-                <label className="block text-sm font-medium text-[#374151] mb-2">
+              <div className="mt-4 pt-4 border-t border-[#E2E8F0]">
+                <label className="block text-sm font-medium text-[#0F172A] mb-2">
                   Don&apos;t see your country? Type it here
                 </label>
                 <Input
@@ -288,7 +288,7 @@ export default function OnboardingPage() {
           {currentStep === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-[#111827] mb-2">
+                <h2 className="text-xl font-semibold text-[#0F172A] mb-2">
                   Tell us about your plans
                 </h2>
                 <p className="text-[#6B7280] text-sm">
@@ -298,7 +298,7 @@ export default function OnboardingPage() {
 
               {/* Budget Range */}
               <div>
-                <label className="block text-sm font-medium text-[#374151] mb-3">
+                <label className="block text-sm font-medium text-[#0F172A] mb-3">
                   What&apos;s your total budget for the program? (in INR)
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -315,11 +315,11 @@ export default function OnboardingPage() {
                           updateField("budgetMax", range.max);
                         }}
                         className={`p-4 rounded-xl border-2 text-left transition-all ${isSelected
-                          ? "border-[#2563EB] bg-[#2563EB]/5"
-                          : "border-[#E5E7EB] hover:border-[#2563EB]/50"
+                          ? "border-[#F59E0B] bg-[#F59E0B]/5"
+                          : "border-[#E2E8F0] hover:border-[#F59E0B]/50"
                           }`}
                       >
-                        <span className="font-medium text-[#111827]">
+                        <span className="font-medium text-[#0F172A]">
                           {range.label}
                         </span>
                       </button>
@@ -333,7 +333,7 @@ export default function OnboardingPage() {
 
               {/* Field of Study */}
               <div>
-                <label className="block text-sm font-medium text-[#374151] mb-3">
+                <label className="block text-sm font-medium text-[#0F172A] mb-3">
                   What do you want to study?
                 </label>
                 <Select
@@ -354,7 +354,7 @@ export default function OnboardingPage() {
 
               {/* Target Intake */}
               <div>
-                <label className="block text-sm font-medium text-[#374151] mb-3">
+                <label className="block text-sm font-medium text-[#0F172A] mb-3">
                   Target intake (optional)
                 </label>
                 <Select
@@ -376,7 +376,7 @@ export default function OnboardingPage() {
           {currentStep === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-[#111827] mb-2">
+                <h2 className="text-xl font-semibold text-[#0F172A] mb-2">
                   Test scores (optional)
                 </h2>
                 <p className="text-[#6B7280] text-sm">
@@ -394,8 +394,8 @@ export default function OnboardingPage() {
                       type="button"
                       onClick={() => toggleTest(test.value)}
                       className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all ${isSelected
-                        ? "border-[#2563EB] bg-[#2563EB] text-white"
-                        : "border-[#E5E7EB] text-[#374151] hover:border-[#2563EB]/50"
+                        ? "border-[#F59E0B] bg-[#F59E0B] text-[#0F172A]"
+                        : "border-[#E2E8F0] text-[#0F172A] hover:border-[#F59E0B]/50"
                         }`}
                     >
                       {test.label}
@@ -467,7 +467,7 @@ export default function OnboardingPage() {
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-[#E5E7EB]">
+          <div className="flex justify-between mt-8 pt-6 border-t border-[#E2E8F0]">
             {currentStep > 1 ? (
               <Button variant="outline" onClick={handleBack}>
                 Back
@@ -488,8 +488,6 @@ export default function OnboardingPage() {
           </div>
         </Card>
       </main>
-
-      <Footer />
     </div>
   );
 }

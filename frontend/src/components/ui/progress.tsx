@@ -20,7 +20,7 @@ export function Progress({
       {/* Progress Bar */}
       <div className="relative h-2 bg-[#E5E7EB] rounded-full overflow-hidden">
         <div
-          className="absolute left-0 top-0 h-full bg-[#2563EB] transition-all duration-500 ease-out rounded-full"
+          className="absolute left-0 top-0 h-full bg-[#F59E0B] transition-all duration-500 ease-out rounded-full"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -40,8 +40,8 @@ export function Progress({
               <div
                 className={clsx(
                   "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300",
-                  isCompleted && "bg-[#2563EB] text-white",
-                  isCurrent && "bg-[#2563EB] text-white ring-4 ring-[#2563EB]/20",
+                  isCompleted && "bg-[#F59E0B] text-white",
+                  isCurrent && "bg-[#F59E0B] text-white ring-4 ring-[#F59E0B]/20",
                   !isCompleted && !isCurrent && "bg-[#E5E7EB] text-[#6B7280]"
                 )}
               >
@@ -67,7 +67,7 @@ export function Progress({
                 <span
                   className={clsx(
                     "text-xs mt-1.5 text-center max-w-[80px]",
-                    isCurrent ? "text-[#2563EB] font-medium" : "text-[#6B7280]"
+                    isCurrent ? "text-[#F59E0B] font-medium" : "text-[#6B7280]"
                   )}
                 >
                   {labels[index]}

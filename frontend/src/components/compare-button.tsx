@@ -35,8 +35,8 @@ export function CompareButton({
         disabled={!isSelected && !canAddMore}
         className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
           isSelected 
-            ? "text-[#2563EB] bg-blue-50 hover:bg-blue-100" 
-            : "text-[#6B7280] hover:text-[#2563EB] hover:bg-blue-50"
+            ? "text-[#0F172A] bg-[#F8FAFC] hover:bg-[#E2E8F0]" 
+            : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
         } ${className}`}
         title={isSelected ? "Remove from compare" : canAddMore ? "Add to compare" : "Compare limit reached (3 max)"}
       >
@@ -60,10 +60,10 @@ export function CompareButton({
         disabled={!isSelected && !canAddMore}
         className={`p-2 rounded-lg transition-all ${
           isSelected
-            ? "bg-[#2563EB] text-white hover:bg-[#1D4ED8]"
+            ? "bg-[#0F172A] text-white hover:bg-[#1E293B]"
             : canAddMore
-            ? "bg-white/90 hover:bg-white text-[#6B7280] hover:text-[#2563EB]"
-            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+            ? "bg-white/90 hover:bg-white text-[#64748B] hover:text-[#0F172A]"
+            : "bg-[#F8FAFC] text-[#94A3B8] cursor-not-allowed"
         } ${className}`}
         title={isSelected ? "Remove from compare" : canAddMore ? "Add to compare" : "Compare limit reached"}
       >

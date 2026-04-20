@@ -29,13 +29,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary:
-        "bg-[#2563EB] text-white hover:bg-[#1D4ED8] focus-visible:ring-[#2563EB] active:scale-[0.98]",
+        "bg-[#0F172A] text-white hover:bg-[#1E293B] focus-visible:ring-[#0F172A] active:scale-[0.98]",
       secondary:
-        "bg-[#E5E7EB] text-[#111827] hover:bg-[#D1D5DB] focus-visible:ring-[#6B7280]",
+        "bg-[#F1F5F9] text-[#0F172A] hover:bg-[#E2E8F0] focus-visible:ring-[#64748B]",
       outline:
-        "border-2 border-[#2563EB] text-[#2563EB] hover:bg-[#2563EB] hover:text-white focus-visible:ring-[#2563EB]",
+        "border-2 border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC] hover:border-[#0F172A] focus-visible:ring-[#0F172A]",
       ghost:
-        "text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] focus-visible:ring-[#6B7280]",
+        "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] focus-visible:ring-[#64748B]",
       whatsapp:
         "bg-[#25D366] text-white hover:bg-[#20BD5A] focus-visible:ring-[#25D366] active:scale-[0.98]",
     };
