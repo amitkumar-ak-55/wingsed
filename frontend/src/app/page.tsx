@@ -1,4 +1,4 @@
-import { Header, Footer, WhatsAppButton } from "@/components";
+import { Header, Footer, WhatsAppButton, FlightPathOverlay } from "@/components";
 import {
   HeroSection,
   CountryStrip,
@@ -10,7 +10,7 @@ import {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div className="relative min-h-screen flex flex-col bg-[#F8FAFC]">
       <Header />
       
       <main className="flex-1">
@@ -24,6 +24,8 @@ export default function HomePage() {
 
       <Footer />
       <WhatsAppButton />
+      <FlightPathOverlay />
     </div>
   );
 }
+

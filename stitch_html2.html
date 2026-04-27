@@ -1,0 +1,284 @@
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WingsEd | The Decision-First Architect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .paper-plane-path {
+            stroke-dasharray: 8 8;
+            stroke-dashoffset: 1000;
+            animation: dash 60s linear infinite;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at top right, rgba(254, 166, 25, 0.05), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(19, 27, 46, 0.02), transparent 40%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(19, 27, 46, 0.05);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#131b2e", // Midnight
+                "secondary": "#855300", // Amber
+                "accent": "#fea619", // Light Amber
+                "surface": "#f7f9fb",
+                "on-surface": "#191c1e",
+                "surface-container": "#eceef0",
+                "outline-variant": "#c6c6cd",
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.5rem", "xl": "1rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+</head>
+<body class="text-on-surface selection:bg-accent/30 overflow-x-hidden">
+<!-- Global Paper Plane Visual Guide (SVG Overlay) -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<svg class="w-full h-[300%]" fill="none" viewbox="0 0 1440 3000" xmlns="http://www.w3.org/2000/svg">
+<path class="paper-plane-path" d="M1300 200 C 1100 400, 400 300, 200 600 S 800 900, 1200 1200 S 200 1500, 300 1900 S 1000 2200, 700 2800" id="flight-path" stroke="#855300" stroke-opacity="0.15" stroke-width="2"></path>
+<!-- Professional Paper Plane Icon (Positioned near the start for static demo, normally would animate along path) -->
+<g transform="translate(1290, 190) rotate(-45)">
+<path d="M21.5 2.5L2 11L9.5 14.5L13.5 22L21.5 2.5Z" fill="#855300" fill-opacity="0.8"></path>
+<path d="M9.5 14.5L14 11L11 16" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"></path>
+</g>
+</svg>
+</div>
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 px-6 py-4">
+<div class="max-w-7xl mx-auto flex items-center justify-between glass-card px-6 py-3 rounded-xl shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-3xl">flight_takeoff</span>
+<span class="font-black text-xl tracking-tighter text-primary uppercase">WingsEd</span>
+</div>
+<div class="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wide uppercase">
+<a class="hover:text-secondary transition-colors" href="#vision">Vision</a>
+<a class="hover:text-secondary transition-colors" href="#architect">Architect</a>
+<a class="hover:text-secondary transition-colors" href="#success">Success</a>
+</div>
+<button class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-secondary transition-all active:scale-95 shadow-lg shadow-primary/10">
+                GET STARTED
+            </button>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative pt-32 pb-24 px-6 hero-gradient overflow-hidden min-h-screen flex items-center">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center z-10">
+<div class="space-y-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-secondary text-xs font-bold tracking-widest uppercase">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+                    The Decision-First Era
+                </div>
+<h1 class="text-6xl md:text-8xl font-black text-primary leading-[0.9] tracking-tighter">
+                    Architecting <br/>
+<span class="text-secondary italic">Momentum.</span>
+</h1>
+<p class="text-lg text-slate-600 max-w-lg leading-relaxed">
+                    WingsEd transcends traditional consulting. We build the decision engines that power global enterprises, turning strategic ambiguity into structural certainty.
+                </p>
+<div class="flex flex-wrap gap-4 pt-4">
+<button class="bg-primary text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-secondary transition-all shadow-xl shadow-primary/20">
+                        Launch Engine <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="bg-white text-primary border border-outline-variant/30 px-8 py-4 rounded-xl font-bold hover:bg-surface-container transition-all">
+                        View Architecture
+                    </button>
+</div>
+</div>
+<div class="relative">
+<div class="aspect-square bg-white rounded-3xl shadow-2xl overflow-hidden border border-outline-variant/10 p-2">
+<div class="w-full h-full bg-surface-container rounded-2xl flex items-center justify-center relative group">
+<img alt="Abstract Data Visualization" class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-multiply transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiZrWuVs_PqNBojM81M4P2TlPQqGKwIt5GM0-oEAno3CIWEK97acGSmIujLAV8fPbAdCEc3bOu4CXHRjnUwXHmxhesyvHCm8bpDMxITZJqqOjD_IduMmoUEpls9og9izAoNq9NGcqd9pik49PGIl2_Ve3iFhcZId9icx7cJcn556pkqGZj9Syv6j6qDroSeUKtMfUepOTNbzyDCXHtZt3PWXPeIMlvjETmhmUiqRNSksaMJ6BvQVVvRaloNlsPPsTeSse1ksLu3HI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="relative z-10 text-white p-8 w-full mt-auto">
+<div class="text-4xl font-black mb-2 leading-none tracking-tighter">98.4%</div>
+<div class="text-sm font-medium tracking-widest uppercase opacity-80">Precision in Predictive Analytics</div>
+</div>
+</div>
+</div>
+<!-- Floating Card -->
+<div class="absolute -bottom-8 -left-8 glass-card p-6 rounded-2xl shadow-xl max-w-xs hidden md:block">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white">insights</span>
+</div>
+<div>
+<div class="text-sm font-bold text-primary">Live Insights</div>
+<div class="text-[10px] text-slate-500 uppercase tracking-widest">Decision Matrix v4.2</div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-3/4"></div>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-1/2"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- The Architect Section -->
+<section class="py-24 px-6 relative bg-white" id="architect">
+<div class="max-w-7xl mx-auto relative z-10">
+<div class="text-center max-w-2xl mx-auto mb-16">
+<h2 class="text-4xl font-black text-primary tracking-tighter mb-4">Engineered to Soar</h2>
+<p class="text-slate-500">Every decision follows a trajectory. We ensure yours are aerodynamically sound, reaching objectives with minimal friction.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="p-8 rounded-3xl border border-outline-variant/10 hover:shadow-xl transition-all group bg-surface">
+<div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-secondary text-3xl">architecture</span>
+</div>
+<h3 class="text-xl font-bold text-primary mb-3">Structural Integrity</h3>
+<p class="text-sm text-slate-500 leading-relaxed">We don't just advise; we build the foundational frameworks that support scale and complexity.</p>
+</div>
+<!-- Card 2 -->
+<div class="p-8 rounded-3xl border border-outline-variant/10 hover:shadow-xl transition-all group bg-white shadow-lg">
+<div class="w-14 h-14 bg-primary rounded-2xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-white text-3xl">rocket_launch</span>
+</div>
+<h3 class="text-xl font-bold text-primary mb-3">Velocity Engines</h3>
+<p class="text-sm text-slate-500 leading-relaxed">Optimize your operational speed. Our engines reduce the latency between choice and execution.</p>
+</div>
+<!-- Card 3 -->
+<div class="p-8 rounded-3xl border border-outline-variant/10 hover:shadow-xl transition-all group bg-surface">
+<div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-secondary text-3xl">hub</span>
+</div>
+<h3 class="text-xl font-bold text-primary mb-3">Adaptive Networks</h3>
+<p class="text-sm text-slate-500 leading-relaxed">Systems that learn and pivot. Future-proof your strategy with self-correcting decision matrices.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Success Stories / Trajectory Section -->
+<section class="py-24 px-6 bg-primary text-white relative overflow-hidden" id="success">
+<!-- Subtle flight path continuation -->
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<svg class="w-full h-full" fill="none" viewbox="0 0 1440 800">
+<path d="M-100 400 C 300 200, 1100 600, 1500 300" stroke="white" stroke-dasharray="10 10" stroke-width="2"></path>
+</svg>
+</div>
+<div class="max-w-7xl mx-auto relative z-10">
+<div class="flex flex-col lg:flex-row items-end justify-between gap-8 mb-16">
+<div class="max-w-xl">
+<span class="text-secondary font-black tracking-widest uppercase text-xs">Proven Trajectories</span>
+<h2 class="text-5xl font-black tracking-tighter mt-4 leading-tight">Where Vision <br/>Meets <span class="text-secondary italic">Velocity.</span></h2>
+</div>
+<div class="text-right">
+<button class="border-b-2 border-secondary pb-1 text-sm font-bold tracking-widest uppercase hover:text-secondary transition-colors">
+                        View Case Studies
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+<div class="group cursor-pointer">
+<div class="aspect-video rounded-3xl overflow-hidden mb-6">
+<img alt="Corporate skyscraper" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale hover:grayscale-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVoJA8vKnni1GS9ax0YASBHEHq16Siu9YPpDIylvZB5C1iFFf1SFKMIWO213iUrpwfDlLKNuqCKjueRcbt0YCERIDX8LIp3-Sw4xQeYid6GdNX7JDW5L8rvT7JtIOXgENsbumzeJY28vgMO770vebeKw1WBnCyqKVSvQ9Xc-7TeA2mjMaoKSGaOQxfiXsclINn1RSjU32y7lgleaE2RkuqNXK2mD1I8xTOFG1HaqTskA7_HIiiEmlJbx_MTqfJXBQiWo88Y6UFcDQ"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-2xl font-bold mb-2">The Aero-Logistics Revamp</h4>
+<p class="text-slate-400 text-sm max-w-md">How a Fortune 500 carrier reduced decision latency by 40% using the WingsEd Core.</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-4xl">north_east</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-video rounded-3xl overflow-hidden mb-6">
+<img alt="Data dashboard" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale hover:grayscale-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8Fo-4OPBKnO-0xPp0a7344TLOG_fqaxdHarq09Gno_sJ5bR2bX-SPYz-XtzKoz4_XZa01Haw3wovnCTpqYgEBAk7K-2cKeiYwfPvHuc0nLDFbYW5NwyDfark5m_F0woKOaifqEtSKQOq5zg5jsDRy2yaNR7oGReFilZV8W-akfkWyC7JZyGDqlQY0WwhnMcnenTSJcVUVSmmpFgcUZR_Fk5R4_itaR4oLEVjT17QT7mPvo1B_ZficGYn4IJ0JQiboTEcsN5uP7fM"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-2xl font-bold mb-2">Predictive Retail Scaling</h4>
+<p class="text-slate-400 text-sm max-w-md">Implementing automated decision matrices for real-time inventory optimization.</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-4xl">north_east</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Contact / CTA -->
+<footer class="py-24 px-6 bg-surface">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-16">
+<div class="max-w-sm">
+<div class="flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-secondary text-3xl">flight_takeoff</span>
+<span class="font-black text-xl tracking-tighter text-primary uppercase">WingsEd</span>
+</div>
+<p class="text-slate-500 text-sm leading-relaxed mb-8">
+                    Defining the next generation of enterprise intelligence. Architecture isn't just about stability; it's about the potential to fly.
+                </p>
+<div class="flex gap-4">
+<div class="w-10 h-10 border border-outline-variant/30 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all cursor-pointer">
+<span class="material-symbols-outlined text-lg">public</span>
+</div>
+<div class="w-10 h-10 border border-outline-variant/30 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all cursor-pointer">
+<span class="material-symbols-outlined text-lg">mail</span>
+</div>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-2 md:grid-cols-3 gap-12">
+<div>
+<h5 class="font-bold text-primary mb-6 uppercase text-xs tracking-widest">Solutions</h5>
+<ul class="space-y-4 text-sm text-slate-500">
+<li class="hover:text-secondary cursor-pointer">Decision Engine</li>
+<li class="hover:text-secondary cursor-pointer">Matrix Design</li>
+<li class="hover:text-secondary cursor-pointer">Operational Velocity</li>
+<li class="hover:text-secondary cursor-pointer">Predictive Core</li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-primary mb-6 uppercase text-xs tracking-widest">Company</h5>
+<ul class="space-y-4 text-sm text-slate-500">
+<li class="hover:text-secondary cursor-pointer">The Vision</li>
+<li class="hover:text-secondary cursor-pointer">Architects</li>
+<li class="hover:text-secondary cursor-pointer">Trajectories</li>
+<li class="hover:text-secondary cursor-pointer">Press</li>
+</ul>
+</div>
+<div class="col-span-2 md:col-span-1">
+<h5 class="font-bold text-primary mb-6 uppercase text-xs tracking-widest">Stay Updated</h5>
+<div class="flex gap-2">
+<input class="bg-white border-outline-variant/30 rounded-lg px-4 py-2 text-sm w-full focus:ring-secondary focus:border-secondary transition-all outline-none" placeholder="Email" type="email"/>
+<button class="bg-primary p-2 rounded-lg text-white hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto border-t border-outline-variant/20 mt-24 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium">
+<p>© 2024 WingsEd Architecture. All Rights Reserved.</p>
+<div class="flex gap-8">
+<a class="hover:text-primary" href="#">Privacy Policy</a>
+<a class="hover:text-primary" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+</body></html>

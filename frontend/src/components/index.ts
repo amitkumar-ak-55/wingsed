@@ -5,3 +5,4 @@ export { SaveButton } from "./save-button";
 export { TrackButton } from "./track-button";
 export { CompareButton } from "./compare-button";
 export { CompareBar } from "./compare-bar";
+export { default as FlightPathOverlay } from "./flight-path-overlay";
