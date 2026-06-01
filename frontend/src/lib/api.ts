@@ -2,7 +2,7 @@
 // API Client with Security Best Practices
 // ===========================================
 
-import type { User, University, Program } from "@/types";
+import type { User, University, Program, LiveRecommendationResult } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -142,6 +142,27 @@ export async function getRecommendations(params?: {
   const query = searchParams.toString();
   return apiClient<{ recommendations: University[] }>(
     `/universities/recommendations${query ? `?${query}` : ""}`,
+    { revalidate: 300 }
+  );
+}
+
+export async function getLiveRecommendations(params?: {
+  country?: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  gpa?: number;
+  limit?: number;
+}) {
+  const searchParams = new URLSearchParams();
+  if (params?.country) searchParams.set("country", params.country);
+  if (params?.budgetMin) searchParams.set("budgetMin", params.budgetMin.toString());
+  if (params?.budgetMax) searchParams.set("budgetMax", params.budgetMax.toString());
+  if (params?.gpa !== undefined) searchParams.set("gpa", params.gpa.toString());
+  if (params?.limit) searchParams.set("limit", params.limit.toString());
+
+  const query = searchParams.toString();
+  return apiClient<LiveRecommendationResult>(
+    `/universities/recommendations/live${query ? `?${query}` : ""}`,
     { revalidate: 300 }
   );
 }

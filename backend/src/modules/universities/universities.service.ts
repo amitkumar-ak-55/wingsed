@@ -4,6 +4,11 @@ import { University, Prisma } from '@prisma/client';
 
 // INR to USD conversion rate
 const INR_TO_USD_RATE = 83;
+const DEFAULT_BUDGET_CAP_USD = 60000;
+
+type UniversityWithPrograms = Prisma.UniversityGetPayload<{
+  include: { programs: true };
+}>;
 
 export interface UniversityFilters {
   country?: string;
@@ -18,6 +23,32 @@ export interface PaginatedResult<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+export type AdmitBucket = 'Safe' | 'Target' | 'Reach';
+
+export interface ScoredUniversity {
+  university: UniversityWithPrograms;
+  score: number;
+  bucket: AdmitBucket;
+  annualCostUsd: number;
+  fit: {
+    affordability: number;
+    admit: number;
+    quality: number;
+    outcomes: number;
+  };
+}
+
+export interface LiveRecommendationResult {
+  recommendations: ScoredUniversity[];
+  summary: {
+    chance: number;
+    profileStrength: 'Building' | 'Moderate' | 'Strong';
+    safeCount: number;
+    targetCount: number;
+    reachCount: number;
+  };
 }
 
 @Injectable()
@@ -190,44 +221,221 @@ export class UniversitiesService {
     budgetMax?: number, // in INR
     limit: number = 6,
   ): Promise<University[]> {
-    const where: Prisma.UniversityWhereInput = {};
-
-    // Filter by preferred country if provided
-    if (preferredCountry) {
-      where.country = preferredCountry;
-    }
-
-    // Budget range filter (convert INR to USD)
-    if (budgetMin !== undefined || budgetMax !== undefined) {
-      where.tuitionFee = {};
-      if (budgetMin !== undefined) {
-        where.tuitionFee.gte = Math.floor(budgetMin / INR_TO_USD_RATE);
-      }
-      if (budgetMax !== undefined) {
-        where.tuitionFee.lte = Math.ceil(budgetMax / INR_TO_USD_RATE);
-      }
-    }
-
-    // Get matching universities
-    let recommendations = await this.prisma.university.findMany({
-      where,
-      orderBy: { name: 'asc' },
-      take: limit,
+    const result = await this.getLiveRecommendations({
+      country: preferredCountry,
+      budgetMin,
+      budgetMax,
+      limit,
     });
 
-    // If not enough results, fill with random universities from other criteria
-    if (recommendations.length < limit) {
-      const existingIds = recommendations.map((u) => u.id);
-      const additional = await this.prisma.university.findMany({
-        where: {
-          id: { notIn: existingIds },
-        },
-        orderBy: { tuitionFee: 'asc' }, // Prefer affordable options
-        take: limit - recommendations.length,
-      });
-      recommendations = [...recommendations, ...additional];
+    return result.recommendations.map((item) => item.university);
+  }
+
+  async getLiveRecommendations(options: {
+    country?: string;
+    budgetMin?: number;
+    budgetMax?: number;
+    gpa?: number;
+    limit?: number;
+  }): Promise<LiveRecommendationResult> {
+    const limit = Math.min(Math.max(options.limit ?? 6, 1), 12);
+    const where: Prisma.UniversityWhereInput = {};
+
+    if (options.country) {
+      where.country = options.country;
     }
 
-    return recommendations;
+    const universities = await this.prisma.university.findMany({
+      where,
+      orderBy: [{ qsRanking: 'asc' }, { name: 'asc' }],
+      include: { programs: true },
+    });
+
+    const scored = universities
+      .map((university) => this.scoreUniversity(university, options))
+      .sort((a, b) => b.score - a.score || a.university.name.localeCompare(b.university.name));
+
+    const recommendations = this.pickBalancedShortlist(scored, limit);
+    const chance = recommendations.length > 0
+      ? Math.round(
+        recommendations.reduce((total, item) => total + item.score, 0) / recommendations.length,
+      )
+      : 0;
+
+    const safeCount = scored.filter((item) => item.bucket === 'Safe').length;
+    const targetCount = scored.filter((item) => item.bucket === 'Target').length;
+    const reachCount = scored.filter((item) => item.bucket === 'Reach').length;
+
+    return {
+      recommendations,
+      summary: {
+        chance,
+        profileStrength: chance >= 78 ? 'Strong' : chance >= 58 ? 'Moderate' : 'Building',
+        safeCount,
+        targetCount,
+        reachCount,
+      },
+    };
+  }
+
+  private scoreUniversity(
+    university: UniversityWithPrograms,
+    options: { budgetMin?: number; budgetMax?: number; gpa?: number },
+  ): ScoredUniversity {
+    const annualCostUsd = this.getEstimatedAnnualCostUsd(university);
+    const affordability = this.getAffordabilityScore(
+      annualCostUsd,
+      options.budgetMin,
+      options.budgetMax,
+    );
+    const admit = this.getAdmitScore(university, options.gpa);
+    const quality = this.getQualityScore(university);
+    const outcomes = this.getOutcomeScore(university);
+    const score = Math.round(
+      affordability * 0.35 +
+      admit * 0.35 +
+      quality * 0.2 +
+      outcomes * 0.1,
+    );
+
+    return {
+      university,
+      score,
+      bucket: this.getBucket(score, admit, affordability),
+      annualCostUsd,
+      fit: {
+        affordability: Math.round(affordability),
+        admit: Math.round(admit),
+        quality: Math.round(quality),
+        outcomes: Math.round(outcomes),
+      },
+    };
+  }
+
+  private pickBalancedShortlist(scored: ScoredUniversity[], limit: number): ScoredUniversity[] {
+    const shortlist: ScoredUniversity[] = [];
+    const buckets: AdmitBucket[] = ['Safe', 'Target', 'Reach'];
+
+    for (const bucket of buckets) {
+      const match = scored.find((item) => item.bucket === bucket && !shortlist.includes(item));
+      if (match) {
+        shortlist.push(match);
+      }
+    }
+
+    for (const item of scored) {
+      if (shortlist.length >= limit) {
+        break;
+      }
+      if (!shortlist.includes(item)) {
+        shortlist.push(item);
+      }
+    }
+
+    return shortlist
+      .slice(0, limit)
+      .sort((a, b) => this.bucketOrder(a.bucket) - this.bucketOrder(b.bucket) || b.score - a.score);
+  }
+
+  private getEstimatedAnnualCostUsd(university: UniversityWithPrograms): number {
+    const housingCost = university.foodHousingCost ?? 0;
+    const scholarship = university.avgScholarshipAmount ?? 0;
+    return Math.max(0, university.tuitionFee + housingCost - scholarship);
+  }
+
+  private getAffordabilityScore(
+    annualCostUsd: number,
+    budgetMin?: number,
+    budgetMax?: number,
+  ): number {
+    const budgetCapUsd = budgetMax !== undefined
+      ? budgetMax / INR_TO_USD_RATE
+      : budgetMin !== undefined
+        ? (budgetMin / INR_TO_USD_RATE) * 1.25
+        : DEFAULT_BUDGET_CAP_USD;
+
+    if (annualCostUsd <= budgetCapUsd) {
+      return 100;
+    }
+
+    const overage = annualCostUsd / budgetCapUsd;
+    if (overage <= 1.15) return 84;
+    if (overage <= 1.35) return 66;
+    if (overage <= 1.6) return 48;
+    return 30;
+  }
+
+  private getAdmitScore(university: UniversityWithPrograms, gpa?: number): number {
+    const gpaScore = this.getGpaFitScore(university, gpa);
+    const acceptanceScore = university.acceptanceRate == null
+      ? 68
+      : this.clamp(25 + university.acceptanceRate * 180, 25, 92);
+
+    return gpa === undefined
+      ? Math.round(acceptanceScore)
+      : Math.round(gpaScore * 0.55 + acceptanceScore * 0.45);
+  }
+
+  private getGpaFitScore(university: UniversityWithPrograms, gpa?: number): number {
+    if (gpa === undefined) {
+      return 70;
+    }
+
+    const programMinimums = (university.programs ?? [])
+      .map((program) => program.gpaMinScore)
+      .filter((minimum): minimum is number => minimum != null);
+    const gpaMinimum = programMinimums.length > 0 ? Math.min(...programMinimums) : 3.2;
+    const delta = gpa - gpaMinimum;
+
+    if (delta >= 0.35) return 96;
+    if (delta >= 0.15) return 88;
+    if (delta >= 0) return 78;
+    if (delta >= -0.2) return 62;
+    if (delta >= -0.45) return 45;
+    return 28;
+  }
+
+  private getQualityScore(university: UniversityWithPrograms): number {
+    const rankings = [
+      university.qsRanking,
+      university.timesRanking,
+      university.usNewsRanking,
+    ].filter((ranking): ranking is number => ranking != null);
+
+    if (rankings.length === 0) {
+      return 58;
+    }
+
+    const bestRanking = Math.min(...rankings);
+    return this.clamp(100 - ((bestRanking - 1) / 500) * 70, 30, 100);
+  }
+
+  private getOutcomeScore(university: UniversityWithPrograms): number {
+    const employment = university.employmentRate == null
+      ? 68
+      : this.clamp(university.employmentRate * 100, 35, 100);
+    const internationalShare = university.internationalStudentPercent == null
+      ? 65
+      : this.clamp(55 + university.internationalStudentPercent * 100, 45, 95);
+
+    return employment * 0.7 + internationalShare * 0.3;
+  }
+
+  private getBucket(score: number, admit: number, affordability: number): AdmitBucket {
+    if (admit >= 80 && affordability >= 78 && score >= 78) {
+      return 'Safe';
+    }
+    if (admit < 64 || score < 68) {
+      return 'Reach';
+    }
+    return 'Target';
+  }
+
+  private bucketOrder(bucket: AdmitBucket): number {
+    return ['Safe', 'Target', 'Reach'].indexOf(bucket);
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
   }
 }

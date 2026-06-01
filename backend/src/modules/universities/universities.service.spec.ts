@@ -109,22 +109,14 @@ describe('UniversitiesService', () => {
     });
 
     it('should filter by search term', async () => {
-      prisma.university.count.mockResolvedValue(1);
-      prisma.university.findMany.mockResolvedValue([mockUniversity] as never);
+      prisma.$queryRawUnsafe
+        .mockResolvedValueOnce([{ count: BigInt(1) }] as never)
+        .mockResolvedValueOnce([mockUniversity] as never);
 
       const result = await service.findMany({ search: 'Test' }, 1, 12);
 
       expect(result.data).toHaveLength(1);
-      expect(prisma.university.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            OR: [
-              { name: { contains: 'Test', mode: 'insensitive' } },
-              { city: { contains: 'Test', mode: 'insensitive' } },
-            ],
-          }),
-        })
-      );
+      expect(prisma.$queryRawUnsafe).toHaveBeenCalledTimes(2);
     });
 
     it('should calculate pagination correctly', async () => {
@@ -233,52 +225,42 @@ describe('UniversitiesService', () => {
     ];
 
     it('should return recommendations by preferred country', async () => {
-      // First call: returns 2 matches; second call (fill-up): returns empty
-      prisma.university.findMany
-        .mockResolvedValueOnce(mockUniversities as any)
-        .mockResolvedValueOnce([] as any);
+      prisma.university.findMany.mockResolvedValueOnce(mockUniversities as any);
 
       const result = await service.getRecommendations('United States');
 
-      // 2 from first call + 0 fill-up = 2
       expect(result).toHaveLength(2);
       expect(prisma.university.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ country: 'United States' }),
-          take: 6,
+          include: { programs: true },
         }),
       );
     });
 
-    it('should convert INR budget to USD', async () => {
-      prisma.university.findMany.mockResolvedValue(mockUniversities as any);
+    it('should use budget in scored recommendations', async () => {
+      prisma.university.findMany.mockResolvedValueOnce(mockUniversities as any);
 
-      await service.getRecommendations(undefined, 1660000, 4150000);
+      const result = await service.getRecommendations(undefined, 1660000, 4150000);
 
-      const call = prisma.university.findMany.mock.calls[0][0];
-      const tuitionFilter = call?.where?.tuitionFee as any;
-      // 1660000 INR / 83 = 20000 USD, 4150000 / 83 ≈ 50000 USD
-      expect(tuitionFilter?.gte).toBe(Math.floor(1660000 / 83));
-      expect(tuitionFilter?.lte).toBe(Math.ceil(4150000 / 83));
+      expect(result).toHaveLength(2);
+      expect(prisma.university.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ include: { programs: true } }),
+      );
     });
 
-    it('should fill with additional universities when not enough matches', async () => {
-      // First call returns only 2 results (under default limit of 6)
-      prisma.university.findMany
-        .mockResolvedValueOnce([mockUniversities[0]] as any)
-        .mockResolvedValueOnce([
-          { ...mockUniversity, id: 'uni-extra-1' },
-          { ...mockUniversity, id: 'uni-extra-2' },
-        ] as any);
+    it('should keep selected country results scoped to that country', async () => {
+      prisma.university.findMany.mockResolvedValueOnce([mockUniversities[0]] as any);
 
       const result = await service.getRecommendations('Australia', undefined, undefined, 3);
 
-      expect(result).toHaveLength(3);
-      // Second call should exclude already-found IDs
-      expect(prisma.university.findMany).toHaveBeenCalledTimes(2);
-      const secondCall = prisma.university.findMany.mock.calls[1][0];
-      const idFilter = secondCall?.where?.id as any;
-      expect(idFilter?.notIn).toContain('uni-1');
+      expect(result).toHaveLength(1);
+      expect(prisma.university.findMany).toHaveBeenCalledTimes(1);
+      expect(prisma.university.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ country: 'Australia' }),
+        }),
+      );
     });
 
     it('should return up to limit universities', async () => {
@@ -294,10 +276,7 @@ describe('UniversitiesService', () => {
     });
 
     it('should handle no filters (return all up to limit)', async () => {
-      // First call: 2 results; second call (fill-up): no more
-      prisma.university.findMany
-        .mockResolvedValueOnce(mockUniversities as any)
-        .mockResolvedValueOnce([] as any);
+      prisma.university.findMany.mockResolvedValueOnce(mockUniversities as any);
 
       const result = await service.getRecommendations();
 

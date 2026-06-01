@@ -99,6 +99,11 @@ export function getCountryFlag(country: string): string {
     "Saudi Arabia": "🇸🇦",
     "Australia": "🇦🇺",
     "New Zealand": "🇳🇿",
+    "Canada": "\uD83C\uDDE8\uD83C\uDDE6",
+    "Singapore": "\uD83C\uDDF8\uD83C\uDDEC",
+    "Hong Kong": "\uD83C\uDDED\uD83C\uDDF0",
+    "South Korea": "\uD83C\uDDF0\uD83C\uDDF7",
+    "Switzerland": "\uD83C\uDDE8\uD83C\uDDED",
   };
   return flags[country] || "🌍";
 }

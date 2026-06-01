@@ -93,6 +93,32 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
+export type AdmitBucket = "Safe" | "Target" | "Reach";
+
+export interface ScoredUniversity {
+  university: University;
+  score: number;
+  bucket: AdmitBucket;
+  annualCostUsd: number;
+  fit: {
+    affordability: number;
+    admit: number;
+    quality: number;
+    outcomes: number;
+  };
+}
+
+export interface LiveRecommendationResult {
+  recommendations: ScoredUniversity[];
+  summary: {
+    chance: number;
+    profileStrength: "Building" | "Moderate" | "Strong";
+    safeCount: number;
+    targetCount: number;
+    reachCount: number;
+  };
+}
+
 export interface WhatsAppLead {
   id: string;
   clerkId: string;

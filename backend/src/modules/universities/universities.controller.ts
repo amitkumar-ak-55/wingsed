@@ -75,6 +75,27 @@ export class UniversitiesController {
   }
 
   /**
+   * Get scored live-engine recommendations for the landing page preview.
+   */
+  @Get('recommendations/live')
+  @HttpCode(HttpStatus.OK)
+  async getLiveRecommendations(
+    @Query('country') country?: string,
+    @Query('budgetMin') budgetMin?: string,
+    @Query('budgetMax') budgetMax?: string,
+    @Query('gpa') gpa?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.universitiesService.getLiveRecommendations({
+      country: country || undefined,
+      budgetMin: budgetMin ? parseInt(budgetMin, 10) : undefined,
+      budgetMax: budgetMax ? parseInt(budgetMax, 10) : undefined,
+      gpa: gpa ? parseFloat(gpa) : undefined,
+      limit: limit ? parseInt(limit, 10) : 3,
+    });
+  }
+
+  /**
    * Get single university by ID (public endpoint)
    */
   @Get(':id')
